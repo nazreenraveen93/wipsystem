@@ -57,11 +57,11 @@
 
 @section Scripts {
     <script>
-        // 1. Add the isProcessAlreadySelected function here:
-        function isProcessAlreadySelected(processId) {
+        // Check if a process is already selected
+        function isProcessAlreadySelected(processId, currentSelect) {
             var selects = document.querySelectorAll('select');
             for (let i = 0; i < selects.length; i++) {
-                if (selects[i].value == processId) {
+                if (selects[i] !== currentSelect && selects[i].value == processId) {
                     return true;
                 }
             }
@@ -92,14 +92,14 @@
             </text>
         }
 
-                    // 2. Add the newSelect event listener here:
                     newSelect.addEventListener('change', function () {
-                        var errorMessage = document.getElementById('errorMessage');
-                        if (isProcessAlreadySelected(this.value)) {
-                            errorMessage.innerText = 'This process is already chosen!';
-                            this.value = '';  // reset the select
-                        } else {
-                            errorMessage.innerText = '';  // clear the error message
+                        if (isProcessAlreadySelected(this.value, this)) {
+                            this.value = '';
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: 'This process is already chosen!'
+                            });
                         }
                     });
 
@@ -124,11 +124,55 @@
                 currentProcessCount++;
             });
 
-            // 3. Add the printButton event listener here:
             var printButton = document.getElementById('printButton');
             if (printButton) {
                 printButton.addEventListener('click', function () {
                     window.location.href = '/YourControllerName/PrintPage';
+                });
+            }
+
+            // Adding the form submit event listener here
+            var form = document.querySelector('form[asp-action="SaveProcessFlow"]');
+            if (form) {
+                form.addEventListener('submit', function (e) {
+                    e.preventDefault();
+
+                    let formData = new FormData(this);
+
+                    fetch('/Product/SaveProcessFlow', { // Updated URL
+                        method: 'POST',
+                        body: formData
+                    })
+                        .then(response => {
+                            // Check if response is okay, else reject the promise
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire(
+                                    'Success!',
+                                    'Process flow successfully registered.',
+                                    'success'
+                                );
+                            } else {
+                                Swal.fire(
+                                    'Error!',
+                                    'Process flow is not registered.',
+                                    'error'
+                                );
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Fetch error: ', error);
+                            Swal.fire(
+                                'Error!',
+                                'An unexpected error occurred.',
+                                'error'
+                            );
+                        });
                 });
             }
         });

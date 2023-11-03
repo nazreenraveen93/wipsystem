@@ -82,36 +82,56 @@ namespace WIPSystem.Web.Controllers
 
             return View(model);
         }
-
         [HttpPost]
         public IActionResult SaveProcessFlow(ProductProcessRegistrationViewModel model)
         {
+            bool isSuccess = false;
+            List<string> errorMessages = new List<string>();
+
             if (ModelState.IsValid)
             {
-                foreach (var selectedProcess in model.SelectedProcesses)
+                using (var transaction = _wIPDbContext.Database.BeginTransaction())
                 {
-                    var mapping = new ProductProcessMapping
+                    try
                     {
-                        ProductId = model.ProductId,
-                        ProcessId = selectedProcess.ProcessId,
-                        Sequence = selectedProcess.Sequence
-                    };
+                        foreach (var selectedProcess in model.SelectedProcesses)
+                        {
+                            var mapping = new ProductProcessMapping
+                            {
+                                ProductId = model.ProductId,
+                                ProcessId = selectedProcess.ProcessId,
+                                Sequence = selectedProcess.Sequence
+                            };
 
-                    _wIPDbContext.ProductProcessMappings.Add(mapping);
+                            _wIPDbContext.ProductProcessMappings.Add(mapping);
+                        }
+
+                        _wIPDbContext.SaveChanges();
+                        transaction.Commit(); // commit the transaction
+
+                        isSuccess = true;
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback(); // rollback the transaction in case of an error
+                                                // Log your exception here
+                        errorMessages.Add("An unexpected error occurred. Please try again later.");
+                    }
                 }
-
-                _wIPDbContext.SaveChanges();
-
-                model.IsFormSubmittedSuccessfully = true; // Set success flag
-
-                return View("RegisterProcessFlow", model);
             }
             else
             {
-                model.IsFormSubmittedSuccessfully = false; // Indicate submission failure
-
-                return View("RegisterProcessFlow", model);
+                // Adding Model validation errors to the list
+                foreach (var modelStateValue in ModelState.Values)
+                {
+                    foreach (var error in modelStateValue.Errors)
+                    {
+                        errorMessages.Add(error.ErrorMessage);
+                    }
+                }
             }
+
+            return Json(new { success = isSuccess, errors = errorMessages });
         }
 
 

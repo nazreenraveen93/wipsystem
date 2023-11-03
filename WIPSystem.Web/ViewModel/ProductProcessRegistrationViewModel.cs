@@ -11,6 +11,7 @@ namespace WIPSystem.Web.ViewModels
         public List<Process> AvailableProcesses { get; set; }
         public List<SelectedProcess> SelectedProcesses { get; set; } = new List<SelectedProcess>();
         public bool IsFormSubmittedSuccessfully { get; set; }
+        public IEnumerable<ProductProcessMapping> ProductProcessMappings { get; set; }
     }
 
 
