@@ -102,10 +102,16 @@ namespace WIPSystem.Web.Controllers
 
                 _wIPDbContext.SaveChanges();
 
-                return RedirectToAction("SuccessPage");
-            }
+                model.IsFormSubmittedSuccessfully = true; // Set success flag
 
-            return View("RegisterProcessFlow", model);
+                return View("RegisterProcessFlow", model);
+            }
+            else
+            {
+                model.IsFormSubmittedSuccessfully = false; // Indicate submission failure
+
+                return View("RegisterProcessFlow", model);
+            }
         }
 
 

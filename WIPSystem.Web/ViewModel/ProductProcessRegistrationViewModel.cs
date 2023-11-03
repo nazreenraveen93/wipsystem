@@ -10,6 +10,7 @@ namespace WIPSystem.Web.ViewModels
         public string CustName { get; set; }
         public List<Process> AvailableProcesses { get; set; }
         public List<SelectedProcess> SelectedProcesses { get; set; } = new List<SelectedProcess>();
+        public bool IsFormSubmittedSuccessfully { get; set; }
     }
 
 

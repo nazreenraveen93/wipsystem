@@ -13,40 +13,61 @@
     </div>
     <div class="row">
         <div class="col-md-12 border-1 border">
-<form method="post" asp-action="SaveProcessFlow">
-    <input type="hidden" asp-for="ProductId" />
-    <div class="form-group">
-        <label>PartNo</label>
-        <input type="text" asp-for="PartNo" class="form-control" readonly />
+            <form method="post" asp-action="SaveProcessFlow">
+                <input type="hidden" asp-for="ProductId" />
+
+                <div class="form-group">
+                    <label>PartNo</label>
+                    <input type="text" asp-for="PartNo" class="form-control" readonly />
+                </div>
+                <div class="form-group">
+                    <label>Customer Name</label>
+                    <input type="text" asp-for="CustName" class="form-control" readonly />
+                </div>
+
+                <div id="processContainer">
+                    @for (int i = 0; i < Model.SelectedProcesses.Count; i++)
+                    {
+                        <div class="form-group">
+                            <select asp-for="SelectedProcesses[i].ProcessId" asp-items="@(new SelectList(Model.AvailableProcesses, "ProcessId", "ProcessName"))" class="form-control"></select>
+                            <span id="errorMessage" class="text-danger"></span>
+                            <input type="number" asp-for="SelectedProcesses[i].Sequence" class="form-control" placeholder="Enter sequence for selected process" />
+                        </div>
+                    }
+                </div>
+
+                @if (Model.IsFormSubmittedSuccessfully)
+                {
+                    <button type="button" id="printButton" class="btn btn-success">
+                        Print <i class="fas fa-print"></i>
+                    </button>
+                }
+                else
+                {
+                    <button type="button" id="addAnotherProcess" class="btn btn-success">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                }
+            </form>
+
+        </div>
     </div>
-    <div class="form-group">
-        <label>Customer Name</label>
-        <input type="text" asp-for="CustName" class="form-control" readonly />
-    </div>
-
-    <div id="processContainer">
-        @for (int i = 0; i < Model.SelectedProcesses.Count; i++)
-        {
-            <div class="form-group">
-                <select asp-for="SelectedProcesses[i].ProcessId" asp-items="@(new SelectList(Model.AvailableProcesses, "ProcessId", "ProcessName"))" class="form-control"></select>
-                <input type="number" asp-for="SelectedProcesses[i].Sequence" class="form-control" placeholder="Enter sequence for selected process" />
-            </div>
-        }
-    </div>
-
-                <button type="button" id="addAnotherProcess" data-state="add">Add Process
-
-                    <i class="fas fa-plus"></i>
-                </button>
-
-    <button type="submit" class="btn btn-primary">Submit</button>
-</form>
-</div>
-</div>
 </div>
 
 @section Scripts {
     <script>
+        // 1. Add the isProcessAlreadySelected function here:
+        function isProcessAlreadySelected(processId) {
+            var selects = document.querySelectorAll('select');
+            for (let i = 0; i < selects.length; i++) {
+                if (selects[i].value == processId) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         document.addEventListener("DOMContentLoaded", function () {
             var currentProcessCount = @Model.SelectedProcesses.Count;
             var processContainer = document.getElementById('processContainer');
@@ -54,12 +75,12 @@
 
             addAnotherProcessButton.addEventListener('click', function () {
                 var newProcessGroup = document.createElement('div');
-                newProcessGroup.className = "form-group d-flex justify-content-between align-items-center"; // Flexbox with space between and vertically aligned
+                newProcessGroup.className = "form-group d-flex justify-content-between align-items-center";
 
                 // Create Select element
                 var newSelect = document.createElement('select');
                 newSelect.name = "SelectedProcesses[" + currentProcessCount + "].ProcessId";
-                newSelect.className = "form-control flex-fill mr-2"; // flex-fill: takes available space, mr-2: margin-right
+                newSelect.className = "form-control flex-fill mr-2";
 
         @foreach (var process in Model.AvailableProcesses)
         {
@@ -71,17 +92,26 @@
             </text>
         }
 
-                    // Create Input element
-                    var newInput = document.createElement('input');
+                    // 2. Add the newSelect event listener here:
+                    newSelect.addEventListener('change', function () {
+                        var errorMessage = document.getElementById('errorMessage');
+                        if (isProcessAlreadySelected(this.value)) {
+                            errorMessage.innerText = 'This process is already chosen!';
+                            this.value = '';  // reset the select
+                        } else {
+                            errorMessage.innerText = '';  // clear the error message
+                        }
+                    });
+
+                var newInput = document.createElement('input');
                 newInput.type = "number";
                 newInput.name = "SelectedProcesses[" + currentProcessCount + "].Sequence";
-                newInput.className = "form-control flex-fill mr-2"; // Same as the select
+                newInput.className = "form-control flex-fill mr-2";
                 newInput.placeholder = "Enter sequence";
 
-                // Create remove icon/button
                 var removeIcon = document.createElement('button');
                 removeIcon.className = "btn btn-danger";
-                removeIcon.innerHTML = '<i class="bi bi-trash"></i>';  // Using bootstrap icons
+                removeIcon.innerHTML = '<i class="bi bi-trash"></i>';
                 removeIcon.onclick = function () {
                     processContainer.removeChild(newProcessGroup);
                 };
@@ -90,16 +120,20 @@
                 newProcessGroup.appendChild(newInput);
                 newProcessGroup.appendChild(removeIcon);
 
-                // Append newProcessGroup to the end of processContainer
                 processContainer.appendChild(newProcessGroup);
-
-                // Increment the count for the next addition
                 currentProcessCount++;
             });
+
+            // 3. Add the printButton event listener here:
+            var printButton = document.getElementById('printButton');
+            if (printButton) {
+                printButton.addEventListener('click', function () {
+                    window.location.href = '/YourControllerName/PrintPage';
+                });
+            }
         });
     </script>
 }
-
 
 
 
