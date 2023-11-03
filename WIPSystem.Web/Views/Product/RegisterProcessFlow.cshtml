@@ -1,0 +1,105 @@
+﻿@model WIPSystem.Web.ViewModels.ProductProcessRegistrationViewModel
+@using WIPSystem.Web.Models
+
+@{
+
+    ViewBag.Title = "RegisterProcessFlow";
+}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="text-uppercase text-center">Register Partno Process Flow</h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 border-1 border">
+<form method="post" asp-action="SaveProcessFlow">
+    <input type="hidden" asp-for="ProductId" />
+    <div class="form-group">
+        <label>PartNo</label>
+        <input type="text" asp-for="PartNo" class="form-control" readonly />
+    </div>
+    <div class="form-group">
+        <label>Customer Name</label>
+        <input type="text" asp-for="CustName" class="form-control" readonly />
+    </div>
+
+    <div id="processContainer">
+        @for (int i = 0; i < Model.SelectedProcesses.Count; i++)
+        {
+            <div class="form-group">
+                <select asp-for="SelectedProcesses[i].ProcessId" asp-items="@(new SelectList(Model.AvailableProcesses, "ProcessId", "ProcessName"))" class="form-control"></select>
+                <input type="number" asp-for="SelectedProcesses[i].Sequence" class="form-control" placeholder="Enter sequence for selected process" />
+            </div>
+        }
+    </div>
+
+                <button type="button" id="addAnotherProcess" class="btn btn-success">
+                    <i class="fas fa-plus"></i>
+                </button>
+
+    <button type="submit" class="btn btn-primary">Submit</button>
+</form>
+</div>
+</div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var currentProcessCount = @Model.SelectedProcesses.Count;
+            var processContainer = document.getElementById('processContainer');
+            var addAnotherProcessButton = document.getElementById('addAnotherProcess');
+
+            addAnotherProcessButton.addEventListener('click', function () {
+                var newProcessGroup = document.createElement('div');
+                newProcessGroup.className = "form-group d-flex justify-content-between align-items-center"; // Flexbox with space between and vertically aligned
+
+                // Create Select element
+                var newSelect = document.createElement('select');
+                newSelect.name = "SelectedProcesses[" + currentProcessCount + "].ProcessId";
+                newSelect.className = "form-control flex-fill mr-2"; // flex-fill: takes available space, mr-2: margin-right
+
+        @foreach (var process in Model.AvailableProcesses)
+        {
+            <text>
+                                    var option = document.createElement('option');
+                    option.value = "@process.ProcessId";
+                    option.text = "@process.ProcessName";
+                    newSelect.appendChild(option);
+            </text>
+        }
+
+                    // Create Input element
+                    var newInput = document.createElement('input');
+                newInput.type = "number";
+                newInput.name = "SelectedProcesses[" + currentProcessCount + "].Sequence";
+                newInput.className = "form-control flex-fill mr-2"; // Same as the select
+                newInput.placeholder = "Enter sequence";
+
+                // Create remove icon/button
+                var removeIcon = document.createElement('button');
+                removeIcon.className = "btn btn-danger";
+                removeIcon.innerHTML = '<i class="bi bi-trash"></i>';  // Using bootstrap icons
+                removeIcon.onclick = function () {
+                    processContainer.removeChild(newProcessGroup);
+                };
+
+                newProcessGroup.appendChild(newSelect);
+                newProcessGroup.appendChild(newInput);
+                newProcessGroup.appendChild(removeIcon);
+
+                // Append newProcessGroup to the end of processContainer
+                processContainer.appendChild(newProcessGroup);
+
+                // Increment the count for the next addition
+                currentProcessCount++;
+            });
+        });
+    </script>
+}
+
+
+
+
+

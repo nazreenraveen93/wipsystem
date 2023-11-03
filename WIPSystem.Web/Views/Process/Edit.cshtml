@@ -1,0 +1,36 @@
+﻿@model WIPSystem.Web.Models.Process
+@{
+   
+    ViewBag.Title = "Edit";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="text-uppercase text-center">Edit Process</h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 border-1 border">
+            <form asp-action="Edit" asp-controller="Process" method="post">
+                @Html.AntiForgeryToken()
+                <div class="mb-3">
+                    <input type="hidden" asp-for="@Model.ProcessId" />
+                    <label asp-for="@Model.ProcessName" class="form-label"></label>
+                    <input asp-for="@Model.ProcessName" class="form-control" />
+                    <span asp-validation-for="@Model.ProcessName" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="@Model.ProcessCode" class="form-label"></label>
+                    <input asp-for="@Model.ProcessCode" class="form-control" />
+                    <span asp-validation-for="@Model.ProcessCode" class="text-danger"></span>
+
+                </div>
+                <div class="mb-3">
+                    <a asp-controller="Process" asp-action="Index" class="btn btn-danger">Back</a>
+                    <button type="submit" class="btn btn-warning">Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
