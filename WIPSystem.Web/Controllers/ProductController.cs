@@ -85,9 +85,6 @@ namespace WIPSystem.Web.Controllers
         [HttpPost]
         public IActionResult SaveProcessFlow(ProductProcessRegistrationViewModel model)
         {
-            bool isSuccess = false;
-            List<string> errorMessages = new List<string>();
-
             if (ModelState.IsValid)
             {
                 using (var transaction = _wIPDbContext.Database.BeginTransaction())
@@ -109,31 +106,22 @@ namespace WIPSystem.Web.Controllers
                         _wIPDbContext.SaveChanges();
                         transaction.Commit(); // commit the transaction
 
-                        isSuccess = true;
+                        // Return JSON indicating success
+                        return Json(new { success = true });
                     }
                     catch (Exception ex)
                     {
                         transaction.Rollback(); // rollback the transaction in case of an error
-                                                // Log your exception here
-                        errorMessages.Add("An unexpected error occurred. Please try again later.");
+                                                // Log the exception here
+                                                // Return JSON indicating failure and include the exception message
+                        return Json(new { success = false, message = "An unexpected error occurred. Please try again later.", exception = ex.Message });
                     }
                 }
             }
-            else
-            {
-                // Adding Model validation errors to the list
-                foreach (var modelStateValue in ModelState.Values)
-                {
-                    foreach (var error in modelStateValue.Errors)
-                    {
-                        errorMessages.Add(error.ErrorMessage);
-                    }
-                }
-            }
-
-            return Json(new { success = isSuccess, errors = errorMessages });
+            // Return JSON indicating validation failure and include the validation errors
+            var errors = ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage)).ToList();
+            return Json(new { success = false, errors = errors });
         }
-
 
     }
 }

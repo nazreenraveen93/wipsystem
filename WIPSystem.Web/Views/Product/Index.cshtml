@@ -84,13 +84,13 @@
 </div>
 @section Scripts{
     <script>
-
-        $('.table').DataTable({
-            language: {
-                search: "_INPUT_",
-                searchPlaceholder: "Search..."
-            }
+        $(document).ready(function () {
+            $('.table').DataTable({
+                language: {
+                    search: "_INPUT_",
+                    searchPlaceholder: "Search..."
+                }
+            });
         });
-
     </script>
- }
+}

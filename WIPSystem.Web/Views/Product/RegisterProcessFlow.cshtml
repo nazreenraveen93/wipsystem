@@ -13,15 +13,16 @@
     </div>
     <div class="row">
         <div class="col-md-12 border-1 border">
-            <form method="post" asp-action="SaveProcessFlow">
+            <form id="processForm" method="post" asp-action="SaveProcessFlow">
                 <input type="hidden" asp-for="ProductId" />
 
                 <div class="form-group">
-                    <label>PartNo</label>
+                    <label asp-for="PartNo">PartNo</label>
                     <input type="text" asp-for="PartNo" class="form-control" readonly />
                 </div>
+
                 <div class="form-group">
-                    <label>Customer Name</label>
+                    <label asp-for="CustName">Customer Name</label>
                     <input type="text" asp-for="CustName" class="form-control" readonly />
                 </div>
 
@@ -29,26 +30,18 @@
                     @for (int i = 0; i < Model.SelectedProcesses.Count; i++)
                     {
                         <div class="form-group">
-                            <select asp-for="SelectedProcesses[i].ProcessId" asp-items="@(new SelectList(Model.AvailableProcesses, "ProcessId", "ProcessName"))" class="form-control"></select>
-                            <span id="errorMessage" class="text-danger"></span>
-                            <input type="number" asp-for="SelectedProcesses[i].Sequence" class="form-control" placeholder="Enter sequence for selected process" />
+                            <select asp-for="@Model.SelectedProcesses[i].ProcessId" asp-items="@(new SelectList(Model.AvailableProcesses, "ProcessId", "ProcessName"))" class="form-control"></select>
+                            <span asp-validation-for="@Model.SelectedProcesses[i].ProcessId" class="text-danger"></span>
+                            <input type="number" asp-for="@Model.SelectedProcesses[i].Sequence" class="form-control" placeholder="Enter sequence for selected process" />
+                            <span asp-validation-for="@Model.SelectedProcesses[i].Sequence" class="text-danger"></span>
                         </div>
                     }
                 </div>
 
-                @if (Model.IsFormSubmittedSuccessfully)
-                {
-                    <button type="button" id="printButton" class="btn btn-success">
-                        Print <i class="fas fa-print"></i>
-                    </button>
-                }
-                else
-                {
-                    <button type="button" id="addAnotherProcess" class="btn btn-success">
-                        <i class="fas fa-plus"></i>
-                    </button>
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                }
+                <button type="button" id="addAnotherProcess" class="btn btn-success">
+                    <i class="fas fa-plus"></i>
+                </button>
+                <button type="submit" class="btn btn-primary">Submit</button>
             </form>
 
         </div>
@@ -67,7 +60,6 @@
             }
             return false;
         }
-
         document.addEventListener("DOMContentLoaded", function () {
             var currentProcessCount = @Model.SelectedProcesses.Count;
             var processContainer = document.getElementById('processContainer');
@@ -85,7 +77,7 @@
         @foreach (var process in Model.AvailableProcesses)
         {
             <text>
-                                    var option = document.createElement('option');
+             var option = document.createElement('option');
                     option.value = "@process.ProcessId";
                     option.text = "@process.ProcessName";
                     newSelect.appendChild(option);
@@ -124,57 +116,49 @@
                 currentProcessCount++;
             });
 
-            var printButton = document.getElementById('printButton');
-            if (printButton) {
-                printButton.addEventListener('click', function () {
-                    window.location.href = '/YourControllerName/PrintPage';
-                });
-            }
+            // var printButton = document.getElementById('printButton');
+            // if (printButton) {
+            //     printButton.addEventListener('click', function () {
+            //         window.location.href = '/YourControllerName/PrintPage';
+            //     });
+            // }
 
-            // Adding the form submit event listener here
-            var form = document.querySelector('form[asp-action="SaveProcessFlow"]');
-            if (form) {
-                form.addEventListener('submit', function (e) {
-                    e.preventDefault();
+            // Attach a submit event listener to your form
 
-                    let formData = new FormData(this);
+            $('#processForm').submit(function (e) {
+                e.preventDefault();
+                var formData = new FormData(this); // Changed to FormData object
 
-                    fetch('/Product/SaveProcessFlow', { // Updated URL
-                        method: 'POST',
-                        body: formData
-                    })
-                        .then(response => {
-                            // Check if response is okay, else reject the promise
-                            if (!response.ok) {
-                                throw new Error('Network response was not ok');
+                // Perform the AJAX request
+                $.ajax({
+                    type: 'POST',
+                    url: '/Product/SaveProcessFlow',
+                    data: JSON.stringify(formData), // Make sure formData is an object here, not a FormData instance
+                    contentType: 'application/json',
+                    processData: false,
+
+                    success: function (response) {
+                        if (response.success) {
+                            // If the response is successful, show an alert and then redirect
+                            alert('Process flow for ' + $('#PartNo').val() + ' added successfully.');
+                            window.location.href = '/Product/Index';
+                        } else {
+                            // If there are errors and it's an array, display them
+                            var errorMessages = "There were errors saving the process flow.";
+                            if (Array.isArray(response.errors)) {
+                                errorMessages += "\n" + response.errors.join("\n");
                             }
-                            return response.json();
-                        })
-                        .then(data => {
-                            if (data.success) {
-                                Swal.fire(
-                                    'Success!',
-                                    'Process flow successfully registered.',
-                                    'success'
-                                );
-                            } else {
-                                Swal.fire(
-                                    'Error!',
-                                    'Process flow is not registered.',
-                                    'error'
-                                );
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Fetch error: ', error);
-                            Swal.fire(
-                                'Error!',
-                                'An unexpected error occurred.',
-                                'error'
-                            );
-                        });
+                            alert(errorMessages);
+                        }
+                    },
+
+                    error: function (xhr, status, error) {
+                        // Handle request errors
+                        var errorMessage = xhr.status + ': ' + xhr.statusText;
+                        alert('Error - ' + errorMessage);
+                    }
                 });
-            }
+            });
         });
     </script>
 }
