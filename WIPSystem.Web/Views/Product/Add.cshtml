@@ -1,7 +1,5 @@
 ﻿
 @model WIPSystem.Web.Models.Product
-
-
 @{
 
     ViewBag.Title = "Add";
@@ -19,7 +17,7 @@
                 @Html.AntiForgeryToken()
                 <div class="mb-3">
                     <label asp-for="@Model.PartNo" class="control-label"></label>
-                    <input asp-for="@Model.PartNo" class="form-control" />
+                    <input asp-for="@Model.PartNo" id="PartNo" class="form-control" />
                     <span asp-validation-for="@Model.PartNo" class="text-danger"></span>
                  </div>
                 <div class="mb-3">
@@ -49,36 +47,32 @@
 @section Scripts {
     <script>
         $(document).ready(function () {
-            console.log('Document ready');
-
             // PartNumber blur event.
             $("#PartNo").blur(function () {
-                console.log('Blur event triggered');
                 var PartNo = $(this).val();
-                console.log('PartNo:', PartNo);
-                fetch('/Product/CheckPartNoExistence?partNo=' + encodeURIComponent(PartNo))
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.exists) {
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Oops...',
-                                text: 'This PartNo already exists!'
-                            }).then((result) => {
-                                $("#PartNo").val(''); // Clear the input field.
-                                $("#PartNo").focus(); // Refocus on the input field for user convenience.
-                            });
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error checking PartNo:', error);
-                    });
-            }); // Close the blur event here
+                if (PartNo) {
+                    fetch('/Product/CheckPartNoExistence?partNo=' + encodeURIComponent(PartNo))
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.exists) {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Oops...',
+                                    text: 'This PartNo already exists!'
+                                }).then(() => {
+                                    $("#PartNo").val('').focus();
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error checking PartNo:', error);
+                        });
+                }
+            });
 
-            // Move the form submit event handler outside of the blur event
+            // Form submit event.
             $("form").submit(function (e) {
                 e.preventDefault();
-
                 var formData = $(this).serialize();
 
                 $.ajax({
@@ -89,35 +83,29 @@
                         if (response.success) {
                             Swal.fire({
                                 icon: 'success',
-                                title: 'PartNo Registered Successfully',
-                                text: 'Kindly register the process flow?',
-                                showCancelButton: true,
-                                confirmButtonText: 'Yes, go to process flow',
-                                cancelButtonText: 'No, stay here'
-                            }).then((result) => {
-                                if (result.isConfirmed) {
-                                    window.location.href = "/Product/RegisterProcessFlow";
-
-                                }
+                                title: 'Success',
+                                text: response.message
+                            }).then(() => {
+                                window.location.href = "/Product/Index";
                             });
                         } else {
                             Swal.fire({
                                 icon: 'error',
                                 title: 'Oops...',
-                                text: response.message || 'An error occurred!'
+                                text: response.message
                             });
                         }
                     },
-                    error: function () {
+                    error: function (xhr, status, error) {
                         Swal.fire({
                             icon: 'error',
                             title: 'Oops...',
-                            text: 'An error occurred during the submission!'
+                            text: 'An unexpected error occurred!'
                         });
                     }
                 });
-            }); // Close the form submit event here
+            });
+        });
 
-        }); // Close the document ready function here
     </script>
 }

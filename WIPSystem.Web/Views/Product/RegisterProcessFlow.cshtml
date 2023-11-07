@@ -27,19 +27,30 @@
                 </div>
 
                 <div id="processContainer">
-                    @for (int i = 0; i < Model.SelectedProcesses.Count; i++)
+                    @if (Model.AvailableProcesses != null && Model.AvailableProcesses.Any())
                     {
-                        <div class="form-group">
-                            <select asp-for="@Model.SelectedProcesses[i].ProcessId" asp-items="@(new SelectList(Model.AvailableProcesses, "ProcessId", "ProcessName"))" class="form-control"></select>
-                            <span asp-validation-for="@Model.SelectedProcesses[i].ProcessId" class="text-danger"></span>
-                            <input type="number" asp-for="@Model.SelectedProcesses[i].Sequence" class="form-control" placeholder="Enter sequence for selected process" />
-                            <span asp-validation-for="@Model.SelectedProcesses[i].Sequence" class="text-danger"></span>
-                        </div>
+                        for (int i = 0; i < Model.SelectedProcesses.Count; i++)
+                        {
+                            <div class="form-group row">
+                                <div class="col-sm-4">
+                                    <select asp-for="@Model.SelectedProcesses[i].ProcessId" asp-items="@(new SelectList(Model.AvailableProcesses, "ProcessId", "ProcessName"))" class="form-control"></select>
+                                </div>
+                                <div class="col-sm-4">
+                                    <input type="number" asp-for="@Model.SelectedProcesses[i].Sequence" class="form-control" placeholder="Enter sequence for selected process" />
+                                </div>
+                                <div class="col-sm-4">
+                                    <button type="button" class="btn btn-danger remove-process"><i class="bi bi-trash"></i></button>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p>No available processes to display.</p>
                     }
                 </div>
-
                 <button type="button" id="addAnotherProcess" class="btn btn-success">
-                    <i class="fas fa-plus"></i>
+                    <i class="fas fa-plus-circle"></i> Add Process
                 </button>
                 <button type="submit" class="btn btn-primary">Submit</button>
             </form>
@@ -47,115 +58,103 @@
         </div>
     </div>
 </div>
-
 @section Scripts {
     <script>
         // Check if a process is already selected
-        function isProcessAlreadySelected(processId, currentSelect) {
-            var selects = document.querySelectorAll('select');
-            for (let i = 0; i < selects.length; i++) {
-                if (selects[i] !== currentSelect && selects[i].value == processId) {
-                    return true;
-                }
-            }
-            return false;
+        function isProcessAlreadySelected(processId) {
+            var selects = document.querySelectorAll('#processContainer select');
+            var selectedValues = Array.from(selects).map(select => select.value);
+            var uniqueSelectedValues = new Set(selectedValues);
+            return uniqueSelectedValues.size !== selectedValues.length;
         }
-        document.addEventListener("DOMContentLoaded", function () {
-            var currentProcessCount = @Model.SelectedProcesses.Count;
+
+        // Function to add a new process selection row
+        function addNewProcess(currentProcessCount) {
             var processContainer = document.getElementById('processContainer');
-            var addAnotherProcessButton = document.getElementById('addAnotherProcess');
 
-            addAnotherProcessButton.addEventListener('click', function () {
-                var newProcessGroup = document.createElement('div');
-                newProcessGroup.className = "form-group d-flex justify-content-between align-items-center";
+            // Create the row div
+            var rowDiv = document.createElement('div');
+            rowDiv.className = 'row form-group';
 
-                // Create Select element
-                var newSelect = document.createElement('select');
-                newSelect.name = "SelectedProcesses[" + currentProcessCount + "].ProcessId";
-                newSelect.className = "form-control flex-fill mr-2";
-
+            // Create the select element for processes
+            var select = document.createElement('select');
+            select.name = `SelectedProcesses[${currentProcessCount}].ProcessId`;
+            select.className = 'form-control col-sm-2';
+            select.style.marginLeft = '10px'; // Add left margin to the button
         @foreach (var process in Model.AvailableProcesses)
         {
             <text>
-             var option = document.createElement('option');
-                    option.value = "@process.ProcessId";
-                    option.text = "@process.ProcessName";
-                    newSelect.appendChild(option);
+                var option = document.createElement('option');
+                option.value = "@process.ProcessId";
+                option.text = "@process.ProcessName";
+                select.appendChild(option);
             </text>
         }
 
-                    newSelect.addEventListener('change', function () {
-                        if (isProcessAlreadySelected(this.value, this)) {
-                            this.value = '';
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Oops...',
-                                text: 'This process is already chosen!'
-                            });
-                        }
-                    });
+                    // Create the input element for the sequence
+                    var input = document.createElement('input');
+            input.type = 'number';
+            input.name = `SelectedProcesses[${currentProcessCount}].Sequence`;
+            input.className = 'form-control col-sm-2';
+            input.placeholder = 'Sequence';
+            input.value = currentProcessCount + 1; // Auto-increment the sequence
+            // input.disabled = true; // Disable the input
+            input.style.marginLeft = '10px'; // Add left margin to the button
 
-                var newInput = document.createElement('input');
-                newInput.type = "number";
-                newInput.name = "SelectedProcesses[" + currentProcessCount + "].Sequence";
-                newInput.className = "form-control flex-fill mr-2";
-                newInput.placeholder = "Enter sequence";
 
-                var removeIcon = document.createElement('button');
-                removeIcon.className = "btn btn-danger";
-                removeIcon.innerHTML = '<i class="bi bi-trash"></i>';
-                removeIcon.onclick = function () {
-                    processContainer.removeChild(newProcessGroup);
-                };
+            // Create the remove button
+            var removeButton = document.createElement('button');
+            removeButton.type = 'button';
+            removeButton.className = 'btn btn-danger col-sm-1';
+            removeButton.innerHTML = '<i class="bi bi-trash"></i>';
+            removeButton.style.marginLeft = '10px'; // Add left margin to the button
+            removeButton.onclick = function () {
+                processContainer.removeChild(rowDiv);
+            };
 
-                newProcessGroup.appendChild(newSelect);
-                newProcessGroup.appendChild(newInput);
-                newProcessGroup.appendChild(removeIcon);
+            rowDiv.appendChild(select);
+            rowDiv.appendChild(input);
+            rowDiv.appendChild(removeButton);
 
-                processContainer.appendChild(newProcessGroup);
+            processContainer.appendChild(rowDiv);
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            var currentProcessCount = @Model.SelectedProcesses.Count;
+            var addAnotherProcessButton = document.getElementById('addAnotherProcess');
+
+            addAnotherProcessButton.addEventListener('click', function () {
+                if (isProcessAlreadySelected()) {
+                    alert('Each process can only be selected once. Please select a different process.');
+                    return;
+                }
+                addNewProcess(currentProcessCount);
                 currentProcessCount++;
             });
 
-            // var printButton = document.getElementById('printButton');
-            // if (printButton) {
-            //     printButton.addEventListener('click', function () {
-            //         window.location.href = '/YourControllerName/PrintPage';
-            //     });
-            // }
-
-            // Attach a submit event listener to your form
-
             $('#processForm').submit(function (e) {
                 e.preventDefault();
-                var formData = new FormData(this); // Changed to FormData object
+                if (isProcessAlreadySelected()) {
+                    alert('Each process can only be selected once. Please select different processes.');
+                    return;
+                }
 
-                // Perform the AJAX request
+                var formData = $(this).serialize(); // Use jQuery's serialize function for form data
+
                 $.ajax({
                     type: 'POST',
                     url: '/Product/SaveProcessFlow',
-                    data: JSON.stringify(formData), // Make sure formData is an object here, not a FormData instance
-                    contentType: 'application/json',
-                    processData: false,
-
+                    data: formData, // Send formData as is, no need for JSON.stringify
                     success: function (response) {
                         if (response.success) {
-                            // If the response is successful, show an alert and then redirect
-                            alert('Process flow for ' + $('#PartNo').val() + ' added successfully.');
+                            alert('Process flow added successfully.');
                             window.location.href = '/Product/Index';
                         } else {
-                            // If there are errors and it's an array, display them
-                            var errorMessages = "There were errors saving the process flow.";
-                            if (Array.isArray(response.errors)) {
-                                errorMessages += "\n" + response.errors.join("\n");
-                            }
-                            alert(errorMessages);
+                            alert(response.message || 'An error occurred while saving the process flow.');
                         }
                     },
-
                     error: function (xhr, status, error) {
-                        // Handle request errors
-                        var errorMessage = xhr.status + ': ' + xhr.statusText;
-                        alert('Error - ' + errorMessage);
+                        alert('An error occurred: ' + xhr.responseText);
                     }
                 });
             });

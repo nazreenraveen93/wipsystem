@@ -1,0 +1,72 @@
+﻿@model WIPSystem.Web.ViewModel.ProductEditViewModel
+
+@{
+    ViewBag.Title = "Edit";
+}
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="text-uppercase text-center">Edit Product & Process Flow </h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 border-1 border">
+            <form asp-action="Edit" asp-controller="Product" method="post">
+                    @Html.AntiForgeryToken()
+                <div class="mb-3">
+                    <input type="hidden" asp-for="Product.ProductId" />
+                    <label asp-for="Product.PartNo" class="form-label"></label>
+                    <input asp-for="Product.PartNo" class="form-control" />
+                    <span asp-validation-for="Product.PartNo" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Product.CustName" class="form-label"></label>
+                    <input asp-for="Product.CustName" class="form-control" />
+                    <span asp-validation-for="Product.CustName" class="text-danger"></span>
+
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Product.PackageSize" class="form-label"></label>
+                    <input asp-for="Product.PackageSize" class="form-control" />
+                    <span asp-validation-for="Product.PackageSize" class="text-danger"></span>
+
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Product.PiecesPerBlank" class="form-label"></label>
+                    <input asp-for="Product.PiecesPerBlank" class="form-control" />
+                    <span asp-validation-for="Product.PiecesPerBlank" class="text-danger"></span>
+                </div>
+                <div id="processContainer">
+                    @if (Model.AvailableProcesses != null && Model.ProductProcessMappings != null)
+                    {
+                        for (int i = 0; i < Model.ProductProcessMappings.Count; i++)
+                        {
+                            <div class="form-group">
+                                <input type="hidden" asp-for="@Model.ProductProcessMappings[i].ProductProcessMappingId" />
+                                <label asp-for="@Model.ProductProcessMappings[i].Sequence" class="control-label">Sequence</label>
+                                <input asp-for="@Model.ProductProcessMappings[i].Sequence" class="form-control" />
+
+                                <label asp-for="@Model.ProductProcessMappings[i].ProcessId" class="control-label">Process</label>
+                                <select asp-for="@Model.ProductProcessMappings[i].ProcessId"
+                                        asp-items="@(new SelectList(Model.AvailableProcesses, "ProcessId", "ProcessName"))"
+                                        class="form-control">
+                                    <option value="">Select a process</option>
+                                </select>
+                                <span asp-validation-for="@Model.ProductProcessMappings[i].ProcessId" class="text-danger"></span>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p>Error: Could not load processes or process mappings. Please try again later.</p>
+                    }
+                </div>
+
+                <div class="form-group">
+                    <a asp-controller="Product" asp-action="Index" class="btn btn-danger">Back</a>
+                    <button type="submit" class="btn btn-warning">Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

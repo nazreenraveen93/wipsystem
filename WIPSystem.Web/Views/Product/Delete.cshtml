@@ -1,0 +1,40 @@
+﻿@model WIPSystem.Web.Models.Product
+@{
+
+    ViewBag.Title = "Delete";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="text-uppercase text-center">Delete Product</h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 border-1 border">
+            <form asp-action="Delete" asp-controller="Product" method="post">
+                @Html.AntiForgeryToken()
+                <div class="mb-3">
+                    <input type="hidden" asp-for="@Model.ProductId" />
+                    <label asp-for="@Model.PartNo" class="form-label"></label>
+                    <input asp-for="@Model.PartNo" class="form-control" disabled />
+                </div>
+                <div class="mb-3">
+                    <label asp-for="@Model.CustName" class="form-label"></label>
+                    <input asp-for="@Model.CustName" class="form-control" disabled />
+                </div>
+                <div class="mb-3">
+                    <a asp-controller="Product" asp-action="Index" class="btn btn-primary">Back</a>
+                    <button type="submit" class="btn btn-danger" onclick="return confirmDelete();">Delete</button>
+                </div>
+            </form>
+
+            <script>
+                function confirmDelete() {
+                    var confirmMessage = "Deleting this product will also delete all related processes. Are you sure you want to proceed?";
+                    return confirm(confirmMessage);
+                }
+            </script>
+        </div>
+    </div>
+</div>
