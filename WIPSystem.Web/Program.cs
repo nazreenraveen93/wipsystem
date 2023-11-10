@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using SmartBreadcrumbs.Extensions;
 using System.Reflection;
 using WIPSystem.Web.Data;
+using WIPSystem.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +23,8 @@ builder.Logging.AddDebug();
 // Add other logging providers as needed
 
 builder.Services.AddControllersWithViews();
+builder.Services.AddScoped<BarcodeService>();
+
 
 var app = builder.Build();
 

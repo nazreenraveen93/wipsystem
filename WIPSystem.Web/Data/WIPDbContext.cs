@@ -15,6 +15,7 @@ namespace WIPSystem.Web.Data
         public DbSet<Process> Process { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<ProductProcessMapping> ProductProcessMappings { get; set; }
+        public DbSet<LotTraveller> LotTravellers { get; set; }
 
 
     }

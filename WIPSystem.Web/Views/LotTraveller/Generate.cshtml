@@ -1,0 +1,62 @@
+﻿@model WIPSystem.Web.ViewModel.GenerateLotTravellerViewModel
+
+@{
+    ViewBag.Title = "Generate Lot Traveller";
+}
+<h2>Generate Lot Traveller</h2>
+
+<form asp-controller="LotTraveller" asp-action="Generate" method="post">
+    <div class="form-group">
+        <label asp-for="SelectedProductId" class="control-label"></label>
+        <select asp-for="SelectedProductId" class="form-control"
+                asp-items="Model.ProductSelectList" onchange="updateCustNameAndProcess()">
+            <option value="">-- Select Part No --</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="CustomerName" class="control-label"></label>
+        <input asp-for="CustomerName" id="CustomerName" class="form-control" readonly />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="ProcessSequence" class="control-label"></label>
+        <div id="processContainer"></div> @* This will be filled dynamically *@
+    </div>
+
+    <div class="form-group">
+        <label asp-for="LotNo" class="control-label"></label>
+        <input asp-for="LotNo" class="form-control" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="DateCreated" class="control-label"></label>
+        <input asp-for="DateCreated" class="form-control" type="date" />
+    </div>
+
+    <div class="form-group">
+        <input type="submit" value="Create" class="btn btn-primary" />
+    </div>
+</form>
+
+@section Scripts {
+    <script>
+        function updateCustNameAndProcess() {
+            var productId = $('#SelectedProductId').val(); // Get the selected product ID
+
+            // Make an AJAX call to fetch the customer name based on the selected product ID
+            $.ajax({
+                url: '/LotTraveller/GetCustomerName', // Replace with the actual URL of your server-side method
+                type: 'GET',
+                data: { productId: productId },
+                success: function (data) {
+                    // Update the CustomerName field with the retrieved customer name
+                    $('#CustomerName').val(data);
+                },
+                error: function () {
+                    console.error('Error fetching customer name.');
+                }
+            });
+        }
+    </script>
+}

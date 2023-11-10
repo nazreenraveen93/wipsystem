@@ -1,0 +1,95 @@
+﻿@model List<LotTraveller>
+<div class="container-fluid">
+    <div class="card">
+        <div class="col-12">
+            <div class="card-header">
+                <div class="col-md-12 text-uppercase ">
+                    <h1 class="card-title" style="font-weight: bold;">Lot Traveller</h1>
+                </div>
+                <div class="col-md-12 text-end">
+                    <a asp-controller="LotTraveller" asp-action="Generate" class="btn btn bg-gradient-primary "><i class="bi bi-plus-circle"></i> Generate Lot Traveller</a>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            @if (Model.Count() > 0)
+            {
+                <table id="table" class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th class="text-center">Product Partno</th>
+                            <th class="text-center">Customer</th>
+                            <th class="text-center">Lot Number</th>
+                            <th class="text-center">Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td width="40%">@item.ProductId</td>
+                                <td width="40%">@item.CustomerName</td>
+                                <td width="40%">@item.LotNo</td>
+
+                                <td class="d-flex align-items-center justify-concent-center">
+                                    <div class="w-50 btn-group" role="group">
+                                        <a asp-controller="Product"
+                                           asp-action="Edit"
+                                           asp-route-LotTravellerId="@item.LotTravellerId"
+                                           class="btn btn-warning"
+                                           data-toggle="tooltip"
+                                           data-placement="top"
+                                           title="Edit"
+                                           style="margin-right: 10px;">
+                                            <!-- Added inline style here -->
+                                            <i class="bi bi-pencil-square"></i>
+                                        </a>
+                                        <a asp-controller="Product"
+                                           asp-action="RegisterProcessFlow"
+                                           asp-route-LotTravellerId="@item.LotTravellerId"
+                                           class="btn btn-default"
+                                           data-toggle="tooltip"
+                                           data-placement="top"
+                                           title="Edit"
+                                           style="margin-right: 10px;">
+                                            <!-- Added inline style here -->
+                                            <i class="bi bi-pencil-square"></i>
+                                        </a>
+                                        <a asp-controller="Product" asp-action="Delete" asp-route-LotTravellerId="@item.LotTravellerId" class="btn btn-danger"
+                                           data-toggle="tooltip" data-placement="top" title="Delete">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="text-center text-uppercase text-warning pt-4">No Records to Show</h2>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+@section Scripts{
+    <script>
+
+        $('.table').DataTable({
+            language: {
+                search: "_INPUT_",
+                searchPlaceholder: "Search..."
+            }
+        });
+
+    </script>
+ }
