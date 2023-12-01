@@ -1,4 +1,5 @@
 ﻿@model List<Product>
+
 <div class="container-fluid">
     <div class="card">
         <div class="col-12">
@@ -15,7 +16,7 @@
             </div>
         </div>
         <div class="card-body">
-            @if (Model.Count() > 0)
+            @if (Model.Any())
             {
                 <table id="table" class="table table-bordered">
                     <thead>
@@ -27,22 +28,21 @@
                             <th class="text-center">Action</th>
                         </tr>
                     </thead>
-
                     <tbody>
-
                         @foreach (var item in Model)
                         {
+                            bool processExists = ViewBag.ProcessFlowExists[item.ProductId];
                             <tr>
-                                <td width="40%">@item.PartNo</td>
-                                <td width="40%">@item.CustName</td>
-                                <td width="40%">@item.PackageSize</td>
+                                <td width="20%">@item.PartNo</td>
+                                <td width="20%">@item.CustName</td>
+                                <td width="20%">@item.PackageSize</td>
                                 <td width="40%">@item.PiecesPerBlank</td>
-                                <td class="d-flex align-items-center justify-concent-center">
-                                    <div class="w-50 btn-group" role="group">
+                                <td class="d-flex align-items-left justify-concent-center">
+                                    <div class="btn-group" role="group">
                                         <a asp-controller="Product"
                                            asp-action="Edit"
                                            asp-route-ProductId="@item.ProductId"
-                                           class="btn btn-outline-warning"
+                                           class="btn btn-warning"
                                            data-toggle="tooltip"
                                            data-placement="top"
                                            title="Edit"
@@ -50,18 +50,15 @@
                                             <!-- Added inline style here -->
                                             <i class="bi bi-pencil-square"></i>
                                         </a>
-                                        <a asp-controller="Product"
-                                           asp-action="RegisterProcessFlow"
-                                           asp-route-ProductId="@item.ProductId"
-                                           class="btn btn-outline-dark"
-                                           data-toggle="tooltip"
-                                           data-placement="top"
-                                           title="Add Process Flow"
-                                           style="margin-right: 10px;">
-                                            <!-- Added inline style here -->
+
+                                        <a asp-controller="Product" asp-action="RegisterProcessFlow" asp-route-ProductId="@item.ProductId"
+                                           class="btn btn-dark @(processExists ? "disabled" : "")"
+                                           style="margin-right: 10px;"
+                                           title="@(processExists ? "Process Flow Already Added" : "Add Process Flow")">
                                             <i class="bi bi-cpu"></i>
                                         </a>
-                                        <a asp-controller="Product" asp-action="Delete" asp-route-ProductId="@item.ProductId" class="btn btn-outline-danger"
+
+                                        <a asp-controller="Product" asp-action="Delete" asp-route-ProductId="@item.ProductId" class="btn btn-danger"
                                            data-toggle="tooltip" data-placement="top" title="Delete">
                                             <i class="bi bi-trash"></i>
                                         </a>
@@ -74,19 +71,15 @@
             }
             else
             {
-                <div class="container-fluid">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <h2 class="text-center text-uppercase text-warning pt-4">No Records to Show</h2>
-                        </div>
-                    </div>
-                </div>
+                <h2 class="text-center text-uppercase text-warning pt-4">No Records to Show</h2>
             }
         </div>
+
     </div>
 </div>
 @section Scripts{
     <script>
+      
         $(document).ready(function () {
             $('.table').DataTable({
                 language: {

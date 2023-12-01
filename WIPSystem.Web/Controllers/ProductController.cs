@@ -24,14 +24,27 @@ namespace WIPSystem.Web.Controllers
             _wIPDbContext = wIPDbContext;
             _logger = logger;
         }
-
-
+        private bool CheckIfProcessFlowExists(int productId)
+        {
+            // Assuming ProductProcessMappings is the correct way to check for process flow existence
+            return _wIPDbContext.Products
+                .Include(p => p.ProductProcessMappings)
+                .Any(p => p.ProductId == productId && p.ProductProcessMappings.Any());
+        }
         public IActionResult Index()
         {
-            List<Product> Product = _wIPDbContext.Products.ToList();
+            var products = _wIPDbContext.Products.ToList();
+            var processFlowExists = new Dictionary<int, bool>();
 
-            return View(Product);
+            foreach (var product in products)
+            {
+                processFlowExists[product.ProductId] = _wIPDbContext.ProductProcessMappings.Any(ppm => ppm.ProductId == product.ProductId);
+            }
+
+            ViewBag.ProcessFlowExists = processFlowExists;
+            return View(products);
         }
+
 
         [HttpGet]
         public IActionResult CheckPartNoExistence(string partNo)
@@ -161,32 +174,38 @@ namespace WIPSystem.Web.Controllers
             }
         }
 
-        // Modify the GET method to include ProductProcessMappings
         [HttpGet]
         public IActionResult Edit(int productId)
         {
-            // First, ensure the related entities are loaded or checked for null before use.
-            var product = _wIPDbContext.Products.FirstOrDefault(x => x.ProductId == productId);
+            var product = _wIPDbContext.Products
+                .Include(p => p.ProductProcessMappings)
+                .FirstOrDefault(p => p.ProductId == productId);
+
             if (product == null)
             {
                 return NotFound();
             }
 
-            var productProcessMappings = _wIPDbContext.ProductProcessMappings
-                                                      .Where(m => m.ProductId == productId)
-                                                      .ToList() ?? new List<ProductProcessMapping>();
-
-            var availableProcesses = GetProcesses() ?? new List<Process>();
+            var processSteps = product.ProductProcessMappings
+                .OrderBy(m => m.Sequence)
+                .Select(m => new ProcessViewModel
+                {
+                    Sequence = m.Sequence,
+                    ProcessId = m.ProcessId,
+                    ProcessName = _wIPDbContext.Process.FirstOrDefault(p => p.ProcessId == m.ProcessId)?.ProcessName
+                })
+                .ToList();
 
             var viewModel = new ProductEditViewModel
             {
                 Product = product,
-                ProductProcessMappings = productProcessMappings,
-                AvailableProcesses = availableProcesses
+                ProcessSteps = processSteps,
+                AvailableProcesses = _wIPDbContext.Process.ToList()
             };
 
             return View(viewModel);
         }
+
 
         private List<Process> GetProcesses()
         {
@@ -196,86 +215,83 @@ namespace WIPSystem.Web.Controllers
             return processes ?? new List<Process>(); // Return an empty list if null.
         }
 
-        //Update
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(ProductEditViewModel viewModel)
+        public IActionResult Edit(ProductEditViewModel viewModel, string deletedProcessIds)
         {
             if (!ModelState.IsValid)
             {
+                viewModel.AvailableProcesses = _wIPDbContext.Process.ToList();
                 return View(viewModel);
             }
 
-            var product = viewModel.Product;
-            var submittedMappings = viewModel.ProductProcessMappings ?? new List<ProductProcessMapping>(); // Ensure this is not null.
+            // Parse the deleted indices
+            var deletedIndices = !string.IsNullOrEmpty(deletedProcessIds)
+                ? deletedProcessIds
+                    .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                    .Select(int.Parse)
+                    .OrderByDescending(i => i) // Important to delete from the end
+                    .ToList()
+                : new List<int>();
 
-            // Load the current product from the DB along with its mappings
-            var dbProduct = _wIPDbContext.Products
-                                         .Include(p => p.ProductProcessMappings)
-                                         .FirstOrDefault(p => p.ProductId == product.ProductId);
+            var product = _wIPDbContext.Products
+                .Include(p => p.ProductProcessMappings)
+                .FirstOrDefault(p => p.ProductId == viewModel.Product.ProductId);
 
-            if (dbProduct == null)
+            if (product == null)
             {
                 return NotFound();
             }
 
-            // Update product properties
-            dbProduct.PartNo = product.PartNo;
-            dbProduct.CustName = product.CustName;
-            dbProduct.PackageSize = product.PackageSize;
-            dbProduct.PiecesPerBlank = product.PiecesPerBlank;
+            // Update product details
+            product.PartNo = viewModel.Product.PartNo;
+            product.CustName = viewModel.Product.CustName;
+            product.PackageSize = viewModel.Product.PackageSize;
+            product.PiecesPerBlank = viewModel.Product.PiecesPerBlank;
+            // ... update other properties ...
 
-            // Remove any mappings that are not included in the submitted data
-            var dbMappingsToRemove = dbProduct.ProductProcessMappings
-                                              .Where(m => !submittedMappings.Any(ppm => ppm.ProductProcessMappingId == m.ProductProcessMappingId))
-                                              .ToList();
-            _wIPDbContext.ProductProcessMappings.RemoveRange(dbMappingsToRemove);
+            // Handle deletions based on indices
+            foreach (var index in deletedIndices)
+            {
+                if (index >= 0 && index < viewModel.ProcessSteps.Count)
+                {
+                    var processStepToDelete = viewModel.ProcessSteps[index];
+                    var mappingToDelete = _wIPDbContext.ProductProcessMappings
+                        .FirstOrDefault(m => m.ProductId == product.ProductId && m.ProcessId == processStepToDelete.ProcessId);
+                    if (mappingToDelete != null)
+                    {
+                        _wIPDbContext.ProductProcessMappings.Remove(mappingToDelete);
+                    }
+                }
+            }
 
             // Update existing mappings and add new ones
-            foreach (var mapping in submittedMappings)
+            foreach (var processStep in viewModel.ProcessSteps)
             {
-                var dbMapping = dbProduct.ProductProcessMappings
-                                         .FirstOrDefault(m => m.ProductProcessMappingId == mapping.ProductProcessMappingId);
+                var mapping = product.ProductProcessMappings
+                    .FirstOrDefault(m => m.ProcessId == processStep.ProcessId);
 
-                if (dbMapping != null)
+                if (mapping != null)
                 {
-                    // Update the existing mapping
-                    dbMapping.Sequence = mapping.Sequence;
-                    dbMapping.ProcessId = mapping.ProcessId;
-                    // ... other properties as necessary
+                    mapping.Sequence = processStep.Sequence;
+                    mapping.ProcessId = processStep.ProcessId;
+                    // ... other mapping updates ...
                 }
                 else
                 {
-                    // The mapping is new, so add it
-                    _wIPDbContext.ProductProcessMappings.Add(new ProductProcessMapping
+                    // Add new mapping
+                    product.ProductProcessMappings.Add(new ProductProcessMapping
                     {
                         ProductId = product.ProductId,
-                        ProcessId = mapping.ProcessId,
-                        Sequence = mapping.Sequence
-                        // Set any other properties you need here
+                        ProcessId = processStep.ProcessId,
+                        Sequence = processStep.Sequence
                     });
                 }
             }
 
-            try
-            {
-                _wIPDbContext.SaveChanges();
-                TempData["warning"] = "Record Updated Successfully";
-                return RedirectToAction(nameof(Index));
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                ModelState.AddModelError("", "Another user has updated this record. Please reload and try again.");
-                return View(viewModel);
-            }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError("", $"An error occurred while updating the product: {ex.Message}");
-                return View(viewModel);
-            }
+            _wIPDbContext.SaveChanges();
+            return RedirectToAction(nameof(Index));
         }
-
-
         [HttpGet]
         public IActionResult Delete(int ProductId)
         {

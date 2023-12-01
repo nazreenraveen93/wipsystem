@@ -7,7 +7,7 @@
                     <h1 class="card-title" style="font-weight: bold;">Lot Traveller</h1>
                 </div>
                 <div class="col-md-12 text-end">
-                    <a asp-controller="LotTraveller" asp-action="Generate" class="btn btn bg-gradient-primary "><i class="bi bi-plus-circle"></i> Generate Lot Traveller</a>
+                    <a asp-controller="LotTraveller" asp-action="Generate" class="btn btn bg-gradient-primary "><i class="bi bi-plus-circle"></i> Create Lot Traveller</a>
                 </div>
             </div>
         </div>
@@ -29,16 +29,26 @@
                         @foreach (var item in Model)
                         {
                             <tr>
-                                <td width="40%">@item.ProductId</td>
+                                <td width="40%">@item.Product.PartNo</td>
                                 <td width="40%">@item.CustomerName</td>
                                 <td width="40%">@item.LotNo</td>
 
                                 <td class="d-flex align-items-center justify-concent-center">
                                     <div class="w-50 btn-group" role="group">
-                                        <a asp-controller="Product"
+                                        <a asp-controller="LotTraveller"
+                                           asp-action="GenerateConfirmation"
+                                           asp-route-lotTravellerId="@item.LotTravellerId"
+                                           class="btn btn-secondary me-2"
+                                           data-toggle="tooltip"
+                                           data-placement="top"
+                                           title="View/Print">
+                                            <i class="bi bi-printer"></i> 
+                                        </a>
+
+                                        <a asp-controller="LotTraveller"
                                            asp-action="Edit"
                                            asp-route-LotTravellerId="@item.LotTravellerId"
-                                           class="btn btn-warning"
+                                           class="btn btn-warning me-2"
                                            data-toggle="tooltip"
                                            data-placement="top"
                                            title="Edit"
@@ -46,18 +56,8 @@
                                             <!-- Added inline style here -->
                                             <i class="bi bi-pencil-square"></i>
                                         </a>
-                                        <a asp-controller="Product"
-                                           asp-action="RegisterProcessFlow"
-                                           asp-route-LotTravellerId="@item.LotTravellerId"
-                                           class="btn btn-default"
-                                           data-toggle="tooltip"
-                                           data-placement="top"
-                                           title="Edit"
-                                           style="margin-right: 10px;">
-                                            <!-- Added inline style here -->
-                                            <i class="bi bi-pencil-square"></i>
-                                        </a>
-                                        <a asp-controller="Product" asp-action="Delete" asp-route-LotTravellerId="@item.LotTravellerId" class="btn btn-danger"
+
+                                        <a asp-controller="LotTraveller" asp-action="Delete" asp-route-LotTravellerId="@item.LotTravellerId" class="btn btn-danger"
                                            data-toggle="tooltip" data-placement="top" title="Delete">
                                             <i class="bi bi-trash"></i>
                                         </a>
@@ -90,6 +90,6 @@
                 searchPlaceholder: "Search..."
             }
         });
-
+       
     </script>
- }
+}

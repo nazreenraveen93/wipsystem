@@ -1,5 +1,6 @@
 ﻿@model WIPSystem.Web.ViewModel.ProductEditViewModel
 
+
 @{
     ViewBag.Title = "Edit";
 }
@@ -12,6 +13,10 @@
     <div class="row">
         <div class="col-md-12 border-1 border">
             <form asp-action="Edit" asp-controller="Product" method="post">
+
+                <input type="hidden" id="deletedProcessIds" name="DeletedProcessIds" value="" />
+
+
                     @Html.AntiForgeryToken()
                 <div class="mb-3">
                     <input type="hidden" asp-for="Product.ProductId" />
@@ -36,37 +41,127 @@
                     <input asp-for="Product.PiecesPerBlank" class="form-control" />
                     <span asp-validation-for="Product.PiecesPerBlank" class="text-danger"></span>
                 </div>
-                <div id="processContainer">
-                    @if (Model.AvailableProcesses != null && Model.ProductProcessMappings != null)
-                    {
-                        for (int i = 0; i < Model.ProductProcessMappings.Count; i++)
-                        {
-                            <div class="form-group">
-                                <input type="hidden" asp-for="@Model.ProductProcessMappings[i].ProductProcessMappingId" />
-                                <label asp-for="@Model.ProductProcessMappings[i].Sequence" class="control-label">Sequence</label>
-                                <input asp-for="@Model.ProductProcessMappings[i].Sequence" class="form-control" />
-
-                                <label asp-for="@Model.ProductProcessMappings[i].ProcessId" class="control-label">Process</label>
-                                <select asp-for="@Model.ProductProcessMappings[i].ProcessId"
-                                        asp-items="@(new SelectList(Model.AvailableProcesses, "ProcessId", "ProcessName"))"
-                                        class="form-control">
-                                    <option value="">Select a process</option>
-                                </select>
-                                <span asp-validation-for="@Model.ProductProcessMappings[i].ProcessId" class="text-danger"></span>
-                            </div>
-                        }
-                    }
-                    else
-                    {
-                        <p>Error: Could not load processes or process mappings. Please try again later.</p>
-                    }
+                <div id="processSteps">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Sequence</th>
+                                <th>Process Name</th>
+                                @* <th>Actions</th> *@
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (int i = 0; i < Model.ProcessSteps.Count; i++)
+                            {
+                                <tr id="@("processStep-" + i)" data-index="@i">
+                                    <td>
+                                        @Html.HiddenFor(model => model.ProcessSteps[i].ProcessId) 
+                                        @Html.TextBoxFor(model => model.ProcessSteps[i].Sequence, new { @class = "form-control", type = "number", min = "1" })
+                                    </td>
+                                    <td>
+                                        @Html.DropDownListFor(model => model.ProcessSteps[i].ProcessId,
+                                    new SelectList(Model.AvailableProcesses, "ProcessId", "ProcessName"),
+                                    htmlAttributes: new { @class = "form-control" })
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-danger delete-process" data-index="@i">
+                                            <i class="fa fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
                 </div>
 
-                <div class="form-group">
-                    <a asp-controller="Product" asp-action="Index" class="btn btn-danger">Back</a>
-                    <button type="submit" class="btn btn-warning">Update</button>
-                </div>
+                <button type="button" class="btn btn-primary" id="addProcessButton">
+                    <i class="fa fa-plus"></i> New Process
+                </button>
+
+                <input type="submit" value="Update" class="btn btn-success" />
+
+                <button type="button" class="btn btn-secondary" onclick="window.location='@Url.Action("Index", "Product")'">Back to List</button>
             </form>
         </div>
     </div>
 </div>
+@section Scripts {
+    <script>
+        // Assuming Model.AvailableProcesses is an array of objects with ProcessId and ProcessName
+    var availableProcesses = @Html.Raw(Json.Serialize(Model.AvailableProcesses));
+    console.log(availableProcesses); // Check if processes are listed correctly
+
+        $(document).ready(function () {
+            // Function to add a new process row
+            $('#addProcessButton').click(function () {
+                var newIndex = $('#processSteps tbody tr').length;
+                var newRow = $('<tr>').attr('id', 'processStep-' + newIndex).attr('data-index', newIndex);
+
+                // Sequence cell
+                var sequenceCell = $('<td>').append($('<input>').attr({
+                    type: 'number',
+                    name: 'ProcessSteps[' + newIndex + '].Sequence',
+                    class: 'form-control',
+                    min: '1'
+                }));
+
+                // Process select cell
+                var processCell = $('<td>').append($('<select>').attr({
+                    name: 'ProcessSteps[' + newIndex + '].ProcessId',
+                    class: 'form-control'
+                }));
+
+
+                // Check and append options to the process select
+                // Add process dropdown cell
+                var processCell = document.createElement('td');
+                var processSelect = document.createElement('select');
+                processSelect.name = 'ProcessSteps[' + newIndex + '].ProcessId';
+                processSelect.className = 'form-control';
+        @foreach (var process in Model.AvailableProcesses)
+        {
+            <text>
+                            var option = document.createElement('option');
+                    option.value = '@process.ProcessId';
+                    option.text = '@process.ProcessName';
+                    processSelect.appendChild(option);
+            </text>
+        }
+                    processCell.appendChild(processSelect);
+
+                // Delete button cell, but only for new rows
+                var deleteButton = $('<button>').attr({
+                    type: 'button',
+                    class: 'btn btn-danger delete-process'
+                }).html('<i class="bi bi-trash-fill"></i>').click(function () {
+                    $(this).closest('tr').remove();
+                    updateSequenceNumbers();
+                });
+
+                var deleteCell = $('<td>').append(deleteButton);
+
+                // Append all cells to the row and the row to the table body
+                newRow.append(sequenceCell, processCell, deleteCell);
+                $('#processSteps tbody').append(newRow);
+            });
+
+            // Function to update the sequence numbers
+            function updateSequenceNumbers() {
+                $('#processSteps tbody tr').each(function (index) {
+                    $(this).find('input[type="number"]').val(index + 1).attr('name', 'ProcessSteps[' + index + '].Sequence');
+                    $(this).find('select').attr('name', 'ProcessSteps[' + index + '].ProcessId');
+                    $(this).attr('data-index', index); // Update the index attribute for each row
+                });
+            }
+
+            // Initially hide delete buttons for existing process steps loaded with the page
+            $('.delete-process').hide();
+
+            // Show delete button only for the newly added rows
+            $(document).on('click', '#addProcessButton', function () {
+                $('.delete-process').last().show();
+            });
+        });
+    </script>
+
+}

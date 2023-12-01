@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - WIPSystem.Web</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="~/css/printStyles.css">
+
+
   @*   <link rel="stylesheet" href="~/dist/css/site.css" asp-append-version="true" /> *@
     <link rel="stylesheet" href="~/WIPSystem.Web.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
@@ -557,13 +560,14 @@
             @RenderBody()
         </main>
     </div>
-        <footer class="main-footer">
+        <footer class="main-footer no-print">
             <strong>Copyright &copy;2023 <a href="https://adminlte.io">WIPSystem.Web</a>.</strong>
             All rights reserved.
             <div class="float-right d-none d-sm-inline-block">
                 <b>Version</b> 1.0
             </div>
         </footer>
+
 
         <!-- Control Sidebar -->
         <aside class="control-sidebar control-sidebar-dark">

@@ -1,0 +1,68 @@
+﻿@model WIPSystem.Web.ViewModel.EditLotTravellerViewModel
+
+@{
+    ViewBag.Title = "Edit Lot Traveller";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="text-uppercase text-center">Edit Lot Traveller</h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 border-1 border">
+
+            <form asp-controller="LotTraveller" asp-action="Edit" method="post" class="form-horizontal">
+                @Html.AntiForgeryToken()
+
+                @Html.HiddenFor(model => model.LotTravellerId)
+
+                <div class="form-group">
+                    <label asp-for="PartNo" class="control-label"></label>
+                    @Html.TextBoxFor(model => model.PartNo, new { @class = "form-control", @readonly = "readonly" })
+
+                    <label asp-for="LotNo" class="control-label"></label>
+                    @Html.TextBoxFor(model => model.LotNo, new { @class = "form-control" })
+
+                    <label asp-for="CustName" class="control-label"></label>
+                    @Html.TextBoxFor(model => model.CustName, new { @class = "form-control", @readonly = "readonly" })
+
+                    <label asp-for="PackageSize" class="control-label"></label>
+                    @Html.TextBoxFor(model => model.PackageSize, new { @class = "form-control", @readonly = "readonly" })
+
+                    <label asp-for="PiecesPerBlank" class="control-label"></label>
+                    @Html.TextBoxFor(model => model.PiecesPerBlank, new { @class = "form-control", @readonly = "readonly" })
+                </div>
+
+                <div id="processSteps">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Sequence</th>
+                                <th>Process Name</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var processStep in Model.ProcessSteps)
+                            {
+                                <tr>
+                                    <td>
+                                        @Html.DisplayFor(_ => processStep.Sequence)
+                                    </td>
+                                    <td>
+                                        @Model.AvailableProcesses.FirstOrDefault(p => p.Value == processStep.ProcessId.ToString())?.Text
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <div class="form-group">
+                <input type="submit" value="Update" class="btn btn-success" />
+                <button type="button" class="btn btn-secondary" onclick="window.location='@Url.Action("Index", "LotTraveller")'">Back to List</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

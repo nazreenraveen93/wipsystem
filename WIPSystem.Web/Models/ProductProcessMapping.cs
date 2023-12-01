@@ -19,6 +19,8 @@ namespace WIPSystem.Web.Models
         [Display(Name = "Sequence")]
         [Required]
         public int Sequence { get; set; }
+
+        public int ProcessCode { get; set; } // Add this line if it's missing
     }
 
 }

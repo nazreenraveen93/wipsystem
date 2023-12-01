@@ -1,0 +1,129 @@
+﻿@using WIPSystem.Web.ViewModel;
+@model WIPSystem.Web.ViewModel.GenerateConfirmationViewModel
+
+@{
+    ViewBag.Title = "Print Lot Traveller";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="text-uppercase text-center"> Lot Traveller</h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 border-1 border">
+<div class="printable" id="confirmationSection">
+    <!-- Add a link to trigger server-side PDF generation -->
+  @*   <a href="@Url.Action("GeneratePdf", "LotTraveller", new { lotTravellerId = Model.LotTravellerId })" class="btn btn-primary">Download as PDF</a> *@
+
+    <p>Lot Traveller created successfully. You can now print the details.</p>
+    <h2>Mass Production</h2>
+   
+    <div style="display: flex; align-items: flex-start;">
+        <div style="flex: 0 0 auto; padding-right: 20px;">
+            @if (!String.IsNullOrEmpty(Model.QRCodeImage))
+            {
+                <img src="data:image/png;base64, @Model.QRCodeImage" alt="QR Code" style="width: 200px;" />
+            }
+            else
+            {
+                <p>There was an error generating the QR code. Please try again.</p>
+            }
+        </div>
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <tbody>
+                                <tr>
+                                    <th scope="row">Part Number:</th>
+                                    <td>@(String.IsNullOrEmpty(Model.PartNo) ? "N/A" : Model.PartNo)</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Customer Name:</th>
+                                    <td>@(String.IsNullOrEmpty(Model.CustName) ? "N/A" : Model.CustName)</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Lot Number:</th>
+                                    <td>@(String.IsNullOrEmpty(Model.LotNo) ? "N/A" : Model.LotNo)</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Piece per blank:</th>
+                                    <td>@(Model.PiecePerBlank > 0 ? Model.PiecePerBlank.ToString() : "N/A")</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Package Size:</th>
+                                    <td>@(!string.IsNullOrEmpty(Model.PackageSize) ? Model.PackageSize : "N/A")</td>
+                                </tr>
+                                <tr>
+                                    <th scope="row">Printed Date:</th>
+                                    <td>@DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+    </div>
+                <hr />
+    <!-- Include other details you want to print here -->
+    <h3>Process Flow</h3>
+    @if (Model.ProcessSteps.Any())
+    {
+        <table id="table" class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Sequence</th>
+                    <th>Process Name</th>
+                    <th>Date</th>
+                    <th>Checked By (EMP NO)</th>
+                    <!-- Add other headers as needed -->
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var step in Model.ProcessSteps)
+                {
+                    <tr>
+                        <td>@step.Sequence</td>
+                        <td>@step.ProcessName</td>
+                        <td></td>
+                        <td></td>
+                        <!-- Render other properties of the step as needed -->
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p>No process flow information available.</p>
+    }
+    <div class="no-print">
+        <button onclick="printSection()" class="btn btn-success">Print this page</button>
+        <button type="button" class="btn btn-secondary" onclick="window.location='@Url.Action("Index", "LotTraveller")'">Back to List</button>
+    </div>
+
+</div>
+</div>
+</div>
+</div>
+
+@section Scripts {
+    <script>
+        function printSection() {
+            window.print();
+        }
+
+        window.onload = function () {
+            var pdfUrl = "@Model.PdfDownloadUrl";
+            console.log('PDF URL:', pdfUrl); // For debugging
+            var lotTravellerId = @Model.LotTravellerId;
+            console.log('LotTravellerId:', lotTravellerId); // For debugging
+
+            if (pdfUrl && lotTravellerId > 0) {
+                window.location.href = pdfUrl;
+            } else {
+                console.error("Invalid PDF URL or LotTravellerId");
+            }
+        }
+
+    </script>
+}
