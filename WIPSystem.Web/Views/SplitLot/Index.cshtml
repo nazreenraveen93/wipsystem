@@ -1,0 +1,105 @@
+﻿@model List<WIPSystem.Web.ViewModel.SplitLotIndexViewModel>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<div class="container-fluid">
+    <div class="card">
+        <div class="col-12">
+            <div class="card-header">
+                <div class="col-md-12 text-uppercase ">
+                    <h1 class="card-title" style="font-weight: bold;">Split Lot Details</h1>
+                </div>
+                <div class="col-md-12 text-end">
+                    <a asp-controller="SplitLot" asp-action="SplitLot" class="btn" style="background-color:#D1EDF4; color: black; border-color:#D1EDF4; font-weight: bold;">
+                        <i class="bi bi-plus-circle"></i> Create Split Lot
+                    </a>
+
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+             <div class="card-body">
+            @if (Model.Any())
+            {
+                    <table id="table" class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Emp.No</th>
+                                <th>Product Partno</th>
+                                <th>Original Lot</th>
+                                <th>Split Lots</th>
+                                <th>Quantity</th>
+                               @*  <th>Camber</th> *@
+                                <th>Date</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+
+                                    <td>@item.EmpNo</td>
+                                    <td>@item.PartNo</td>
+                                    <td>@item.OriginalLot</td>
+                                    <td>
+                                        @foreach (var detail in item.SplitDetails)
+                                        {
+                                            <div>@detail.LotNumber (@detail.Quantity) - @detail.Camber</div>
+                                        }
+                                    </td>
+                                    <td>@item.Quantity</td>
+                                   @*  <td>@item.Camber</td> *@
+                                    <td>@(item.Date > DateTime.MinValue ? item.Date.ToShortDateString() : "Not Set")</td>
+                                    <td width="10%">
+                                        <!-- Actions like edit/delete -->
+                                        <a asp-action="Edit"
+                                           asp-route-id="@item.Id"
+                                           class="btn btn-warning me-2"
+                                           data-bs-toggle="tooltip"
+                                           data-bs-placement="top"
+                                           title="Edit"
+                                           style="margin-right: 10px;">
+                                            <i class="bi bi-pencil-square"></i>
+                                        </a>
+
+                                        <a asp-action="Delete"
+                                           asp-route-id="@item.Id"
+                                           class="btn btn-danger"
+                                           data-bs-toggle="tooltip"
+                                           data-bs-placement="top"
+                                           title="Delete">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+
+                    </table>
+                }
+                else
+                {
+                    <h2 class="text-center text-uppercase text-warning pt-4">No Records to Show</h2>
+                }
+            </div>
+
+        </div>
+    </div>
+</div>
+@section Scripts{
+        <script>
+
+            $(document).ready(function () {
+                $('.table').DataTable({
+                    language: {
+                        search: "_INPUT_",
+                        searchPlaceholder: "Search..."
+                    }
+                }); // This closing bracket was missing
+            }); // This closes the $(document).ready function
+        </script>
+    }
+

@@ -1,0 +1,24 @@
+﻿@model List<WIPSystem.Web.Models.SplitDetail>
+
+
+@{
+    ViewData["Title"] = "Split Details";
+}
+
+<h2>Split Details</h2>
+
+<form asp-action="FinalizeSplit" method="post">
+    @for (int i = 0; i < Model.Count; i++)
+    {
+        <div>
+            <h3>Detail @i</h3>
+            <input asp-for="@Model[i].LotNumber" hidden />
+            <p>Lot Number: @Model[i].LotNumber</p>
+            <label for="quantity-@i">Quantity:</label>
+            <input asp-for="@Model[i].Quantity" id="quantity-@i" />
+            <label for="camber-@i">Camber:</label>
+            <input asp-for="@Model[i].Camber" id="camber-@i" />
+        </div>
+    }
+    <button type="submit" class="btn btn-primary">Finalize</button>
+</form>

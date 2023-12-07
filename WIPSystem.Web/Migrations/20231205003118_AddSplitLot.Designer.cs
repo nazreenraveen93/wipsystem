@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WIPSystem.Web.Data;
 
@@ -11,9 +12,11 @@ using WIPSystem.Web.Data;
 namespace WIPSystem.Web.Migrations
 {
     [DbContext(typeof(WIPDbContext))]
-    partial class WIPDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231205003118_AddSplitLot")]
+    partial class AddSplitLot
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -124,34 +127,6 @@ namespace WIPSystem.Web.Migrations
                     b.ToTable("ProductProcessMappings");
                 });
 
-            modelBuilder.Entity("WIPSystem.Web.Models.SplitDetail", b =>
-                {
-                    b.Property<int>("SplitDetailId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("SplitDetailId"));
-
-                    b.Property<string>("Camber")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("LotNumber")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SplitLotId")
-                        .HasColumnType("int");
-
-                    b.HasKey("SplitDetailId");
-
-                    b.HasIndex("SplitLotId");
-
-                    b.ToTable("SplitDetails");
-                });
-
             modelBuilder.Entity("WIPSystem.Web.Models.SplitLot", b =>
                 {
                     b.Property<int>("SplitLotId")
@@ -217,17 +192,6 @@ namespace WIPSystem.Web.Migrations
                     b.Navigation("Process");
 
                     b.Navigation("Product");
-                });
-
-            modelBuilder.Entity("WIPSystem.Web.Models.SplitDetail", b =>
-                {
-                    b.HasOne("WIPSystem.Web.Models.SplitLot", "SplitLot")
-                        .WithMany()
-                        .HasForeignKey("SplitLotId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("SplitLot");
                 });
 
             modelBuilder.Entity("WIPSystem.Web.Models.Process", b =>

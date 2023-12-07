@@ -1,0 +1,127 @@
+﻿@using WIPSystem.Web.ViewModel; 
+@model WIPSystem.Web.ViewModel.LotSplitViewModel
+
+@{
+    ViewBag.Title = "Split Lot";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="text-uppercase text-center">Split Lot</h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 border-1 border">
+            <form asp-controller="SplitLot" asp-action="SplitLot" id="splitLotForm" method="post">
+                <div class="form-group">
+                    <label for="SplitLot.EmpNo">Employee Number</label>
+                    <input asp-for="EmpNo" class="form-control" />
+                </div>
+
+                <div class="form-group">
+                    <label for="PartNo">Part Number</label>
+                    <input asp-for="PartNo" id="PartNo" class="form-control"  />
+                </div>
+
+                <div class="form-group">
+                    <label for="OriginalLot">Original Lot Number</label>
+                    <input asp-for="OriginalLot" id="OriginalLot" class="form-control"  />
+                </div>
+
+
+                <div class="form-group">
+                    <label for="Quantity">Original Quantity</label>
+                    <input asp-for="Quantity" id="Quantity" class="form-control" type="number" />
+                </div>
+
+                <div class="form-group">
+                    <label for="SplitLot.SplitSuffix">Split into ?</label>
+                    <input asp-for="SplitSuffix" class="form-control" id="SplitSuffix" />
+                    <span asp-validation-for="SplitSuffix" class="text-danger"></span>
+                </div>
+
+                <div id="dynamicFieldsContainer"></div>
+
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+
+            // Validate original lot input
+            $("#OriginalLot").blur(function () {
+                var original_lot_parts = $(this).val().split('-');
+
+                if (original_lot_parts.length === 2 && original_lot_parts[1].length > 5) {
+
+                    // Use SweetAlert2 for error message
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'The portion of the lot number after the hyphen should not exceed 5 characters!',
+                        footer: 'Please enter a valid lot number.(xxxxx-XXXXX)'
+                    });
+
+                    // Add the red border using class
+                    $(this).addClass('invalid-input');
+                    $(this).val("");  // Clear the input
+                    $(this).focus();  // Set focus back to the input
+                } else {
+                    $(this).removeClass('invalid-input'); // Remove the red border if input is valid
+                }
+            });
+            $("#SplitSuffix").blur(function () {
+                var processCount = parseInt($(this).val());
+                $("#dynamicFieldsContainer").empty();
+
+                if (isNaN(processCount) || processCount > 9) {
+                    alert("Split count should be a number and less than or equal to 9!");
+                    $(this).val("");
+                    $(this).focus();
+                    return;
+                }
+
+                var tableHTML = '<table class="table table-bordered">...</table>';
+                var original_lot = $("#OriginalLot").val();
+                var [prefix, originalSuffix] = original_lot.split('-');
+                originalSuffix = parseInt(originalSuffix);
+
+                if (isNaN(originalSuffix)) {
+                    console.error("Original suffix is not a number");
+                    return; // Exit if the original suffix isn't a number
+                }
+
+                var tableHTML = '<table class="table table-bordered"><thead><tr><th>Quantity</th><th>Lot Number</th><th>Camber</th><th>Action</th></tr></thead><tbody>';
+
+                for (var i = 0; i < processCount; i++) {
+                    var newSuffix = originalSuffix * 10 + (i + 1);
+                    if (isNaN(newSuffix)) {
+                        console.error("New suffix calculation resulted in NaN");
+                        continue; // Skip this iteration if the newSuffix isn't a number
+                    }
+                    var newLotNumber = `${prefix}-${newSuffix}`;
+
+                    // Make sure the name attributes match your ViewModel properties
+                    tableHTML += `<tr>
+                                <td><input type="number" class="form-control lot-qty" placeholder="Enter Quantity" name="SplitDetails[${i}].Quantity" required></td>
+                                <td><input type="text" class="form-control lot-number" value='${prefix}-${newSuffix}' readonly name="SplitDetails[${i}].LotNumber"></td>
+                                <td><input type="text" class="form-control camber" placeholder="Enter Camber" name="SplitDetails[${i}].Camber" required></td>
+                                <td><button type="button" class="btn btn-danger btn-sm delete-row-btn">Delete</button></td>
+                            </tr>`;
+                }
+                tableHTML += '</tbody></table>';
+                $("#dynamicFieldsContainer").html(tableHTML);
+            });
+
+            // Click event for delete buttons
+            $(document).on('click', '.delete-row-btn', function () {
+                $(this).closest('tr').remove();
+            });
+        });
+    </script>
+}
