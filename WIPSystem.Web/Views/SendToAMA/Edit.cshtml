@@ -1,0 +1,168 @@
+﻿@model SendToAmaViewModel
+@{
+    ViewData["Title"] = "Edit Send to AMA Process";
+}
+
+<div class="container">
+    <h2 class="text-uppercase text-center">Edit Send to AMA Process</h2>
+    <br />
+
+    <!-- Display validation errors here -->
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger" role="alert">
+            @foreach (var item in ViewData.ModelState.Values)
+            {
+                foreach (var error in item.Errors)
+                {
+                    <p>@error.ErrorMessage</p>
+                }
+            }
+        </div>
+    }
+    <br />
+
+    <div class="row">
+        <div class="col-md-12">
+            <!-- Note the asp-action is now "Edit" -->
+            <form id="editamaForm" asp-controller="SendtoAMA" asp-action="Edit" method="post" class="row g-3 p-3" style="border: 2px solid #dee2e6; border-radius: 0.25rem;">
+
+                @Html.AntiForgeryToken()
+
+                <!-- Use hidden fields to store IDs -->
+                @Html.HiddenFor(model => model.AMAId)
+                @Html.HiddenFor(model => model.CurrentStatusId)
+
+                <div class="col-md-4">
+                    <label asp-for="PartNo">Part No</label>
+                    <input asp-for="PartNo" class="form-control" readonly />
+                    <span asp-validation-for="PartNo" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="LotNo">Lot No</label>
+                    <input asp-for="LotNo" class="form-control" readonly />
+                    <span asp-validation-for="LotNo" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="PackageSize">Package Size</label>
+                    <input asp-for="PackageSize" class="form-control" readonly />
+                    <span asp-validation-for="PackageSize" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="CustomerName">Customer Name</label>
+                    <input asp-for="CustomerName" class="form-control" readonly />
+                    <span asp-validation-for="CustomerName" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="PiecesPerBlank">Pieces Per Blank</label>
+                    <input asp-for="PiecesPerBlank" class="form-control" readonly />
+                    <span asp-validation-for="PiecesPerBlank" class="text-danger"></span>
+                </div>
+
+
+                <div class="col-md-4">
+                    <label asp-for="OutputQty">Total Output Qty</label>
+                    <input asp-for="OutputQty" class="form-control" type="number" />
+                    <span asp-validation-for="OutputQty" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="RejectQty">Rejet Qty</label>
+                    <input asp-for="RejectQty" class="form-control" type="number" />
+                    <span asp-validation-for="RejectQty" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="Difference">Difference</label>
+                    <input asp-for="Difference" class="form-control" type="number" />
+                    <span asp-validation-for="Difference" class="text-danger"></span>
+                    <div id="quantityMatchMessage" class="text-success" style="display: none;"></div>
+                </div>
+
+                @* Additional fields for Remarks *@
+                <div class="col-md-6">
+                    <label asp-for="Remarks">Remarks</label>
+                    <textarea asp-for="Remarks" class="form-control"></textarea>
+                    <span asp-validation-for="Remarks" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="Status">Status</label>
+                    <select asp-for="Status" class="form-control">
+                        <option value="">Select Status</option>
+                        <option value="Completed">Completed</option>
+                        <option value="OnHold">On Hold</option>
+                    </select>
+                    <span asp-validation-for="Status" class="text-danger"></span>
+                </div>
+
+
+                <div class="col-md-6">
+                    <label asp-for="CheckedBy">PIC</label>
+                    <input asp-for="CheckedBy" class="form-control" readonly />
+                    <span asp-validation-for="CheckedBy" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <input type="submit" value="Update" class="btn btn-success" />
+                    <input type="button" value="Cancel" class="btn btn-danger" onclick="window.location.href='@Url.Action("Index1")'" />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <script>
+        document.getElementById('editamaForm').addEventListener('submit', function (event) {
+            var processCurrentStatus = document.getElementById('ProcessCurrentStatus').textContent;
+            document.getElementById('processcurrentstatushidden').value = processCurrentStatus;
+
+            if (!validateTotalAgainstReceived()) {
+                event.preventDefault();
+                swal({
+                    title: "Error",
+                    text: "Total of output, reject, and difference does not match received quantity.",
+                    icon: "error",
+                    button: "OK",
+                });
+            }
+        });
+
+
+
+        function validateTotalAgainstReceived() {
+            const outputQty = parseInt(document.querySelector('input[name="OutputQty"]').value) || 0;
+            const rejectQty = parseInt(document.querySelector('input[name="RejectQty"]').value) || 0;
+            const difference = parseInt(document.querySelector('input[name="Difference"]').value) || 0;
+            const receivedquantity = parseInt(document.querySelector('input[name="ReceivedQuantity"]').value) || 0;
+
+            const totalQty = outputQty + rejectQty + difference;
+            if (totalQty === receivedquantity) {
+                document.querySelectorAll('input[name="OutputQty"], input[name="RejectQty"], input[name="Difference"]').forEach(input => {
+                    input.setCustomValidity('');
+                });
+                return true;
+            } else {
+                document.querySelectorAll('input[name="OutputQty"], input[name="RejectQty"], input[name="Difference"]').forEach(input => {
+                    input.setCustomValidity('Total does not match Received Quantity');
+                });
+                return false;
+            }
+        }
+
+        document.querySelectorAll('input[name="OutputQty"], input[name="RejectQty"], input[name="Difference"]').forEach(function (input) {
+            input.addEventListener('input', validateTotalAgainstReceived);
+        });
+
+        @if (TempData["Success"] != null)
+        {
+            <text>
+                swal("Success", "@TempData["Success"].ToString()", "success");
+            </text>
+        }
+    </script>
+}

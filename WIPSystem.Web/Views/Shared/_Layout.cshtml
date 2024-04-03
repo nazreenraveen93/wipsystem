@@ -1,5 +1,7 @@
-﻿<!DOCTYPE html>
+﻿
+<!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -11,6 +13,7 @@
   @*   <link rel="stylesheet" href="~/dist/css/site.css" asp-append-version="true" /> *@
     <link rel="stylesheet" href="~/WIPSystem.Web.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="~/dist/css/bootstrap-icons.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
@@ -37,8 +40,11 @@
 
 
 </head>
+
 <body class="hold-transition sidebar-mini layout-fixed">
     <partial name="_Notification" />
+      @*  @if (User.Identity.IsAuthenticated)
+        { *@
     <div class="wrapper">
         <!-- Navbar -->
         <nav class="main-header navbar navbar-expand navbar-white navbar-light">
@@ -47,42 +53,56 @@
                 <li class="nav-item">
                     <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
                 </li>
-                <li class="nav-item d-none d-sm-inline-block">
-                    <a href="index3.html" class="nav-link">Home</a>
+                <!-- Greeting or user name -->
+                <li class="nav-item">
+                    <span class="navbar-text me-3" style="font-size: medium; color:blue;">
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <span>Hi, @User.Identity.Name 😊</span>
+                        }
+                        else
+                        {
+                            <span>Hi, Guest 😊</span>
+                        }
+                    </span>
                 </li>
-                <li class="nav-item d-none d-sm-inline-block">
-                    <a href="Process" class="nav-link">Process</a>
-                </li>
-                <li class="nav-item d-none d-sm-inline-block">
-                    <a href="#" class="nav-link">Contact</a>
-                </li>
+                <!-- Current time and date -->
+               
             </ul>
 
             <!-- Right navbar links -->
-            <ul class="navbar-nav ml-auto">
-                <!-- Navbar Search -->
+            <ul class="navbar-nav ms-auto">
                 <li class="nav-item">
-                   
-                    <div class="navbar-search-block">
-                        <form class="form-inline">
-                            <div class="input-group input-group-sm">
-                               
-                                <div class="input-group-append">
-                                  
-                                  
-                                </div>
-                            </div>
-                        </form>
-                    </div>
+                    <span class="navbar-text" style="font-size: medium; color: black;">
+                        @DateTime.Now.ToString("yyyy-MM-dd : HH:mm")
+                    </span>
                 </li>
 
-                <!-- session/time -->
-               
-                <!-- Notifications Dropdown Menu -->
-              
-              
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <li class="nav-item">
+                        <!-- Logout Form -->
+                        <form asp-controller="Account" asp-action="Logout" method="post" class="form-inline">
+                            <button type="submit" class="btn btn-link nav-link">
+                                <i class="fas fa-sign-out-alt" style="color: red;"></i> Logout
+                            </button>
+                        </form>
+                    </li>
+                }
+                else
+                {
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Account" asp-action="Login">
+                            <i class="fas fa-sign-in-alt" style="color: green;"></i> Login
+                        </a>
+                    </li>
+                }
+
+
             </ul>
         </nav>
+       
+
         <!-- /.navbar -->
         <!-- Main Sidebar Container -->
         <aside class="main-sidebar sidebar-dark-primary elevation-4">
@@ -118,9 +138,12 @@
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                         <!-- Add icons to the links using the .nav-icon class
                              with font-awesome or any other icon font library -->
+                        <!-- Only show this section if the user is in the 'Super Admin' or 'Admin' role -->
+                        @if (User.IsInRole("Super Admin") || User.IsInRole("Admin"))
+                        {
                         <li class="nav-header">MAIN</li>
                         <li class="nav-item ">
-                            <a href="#" class="nav-link">
+                             <a asp-controller="CurrentStatus" asp-action="Index" class="nav-link">
                                 <i class="nav-icon fas fa-tachometer-alt"></i>
                                 <p>
                                     Dashboard
@@ -158,7 +181,7 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a href="#" class="nav-link">
+                                    <a asp-controller="Machine" asp-action="Index" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
                                         <p>Machine</p>
                                     </a>
@@ -183,276 +206,462 @@
                             </a>
                             <ul class="nav nav-treeview">
                                 <li class="nav-item">
-                                    <a href="#" class="nav-link">
+                                    <a asp-controller="Incoming" asp-action="Index" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
-                                        <p>Incoming</p>
+                                        <p>20102 - Incoming</p>
                                     </a>
                                 </li>
-                                <li class="nav-item">
-                                    <a href="#" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>1000 Sinter</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="#" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>Breaking</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="#" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>Camber Selec</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="#" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>S-Dist Select</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="#" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>Burr Remove</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="#" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>INSP2</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="pages/layout/collapsed-sidebar.html" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>MQC</p>
-                                    </a>
-                                </li>
-                                 <li class="nav-item">
-                                    <a href="pages/layout/collapsed-sidebar.html" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>NI Plating</p>
-                                    </a>
-                                </li>
-                                     <li class="nav-item">
-                                    <a href="pages/layout/collapsed-sidebar.html" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>NI Plating2</p>
-                                    </a>
-                                </li>
-                                  <li class="nav-item">
-                                    <a href="pages/layout/collapsed-sidebar.html" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>AGCUSET</p>
-                                    </a>
-                                </li>
-                                 <li class="nav-item">
-                                    <a href="pages/layout/collapsed-sidebar.html" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>Brazing</p>
-                                    </a>
-                                </li>
-                                 <li class="nav-item">
-                                    <a href="pages/layout/collapsed-sidebar.html" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>I-KI Etching</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="pages/layout/collapsed-sidebar.html" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>Rough NI Plating</p>
-                                    </a>
-                                </li>
-                                 <li class="nav-item">
-                                    <a href="pages/layout/collapsed-sidebar.html" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>NI Plating3</p>
-                                    </a>
-                                </li>
-                                 <li class="nav-item">
-                                    <a href="pages/layout/collapsed-sidebar.html" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>NI Plating4</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="pages/layout/collapsed-sidebar.html" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>750 Sinter1</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="pages/layout/collapsed-sidebar.html" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>S-Grinding</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="pages/layout/collapsed-sidebar.html" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>NI Plating5</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="pages/layout/collapsed-sidebar.html" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>750 Sinter2</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="pages/layout/collapsed-sidebar.html" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>S-Subcon-IN</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="pages/layout/collapsed-sidebar.html" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>S-Subcon-OUT</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="pages/layout/collapsed-sidebar.html" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>MQC2</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="pages/layout/collapsed-sidebar.html" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>Pressing</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="pages/layout/collapsed-sidebar.html" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>Gaug Select</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="pages/layout/collapsed-sidebar.html" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>AU Plating1</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="pages/layout/collapsed-sidebar.html" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>AU Plating2</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="pages/layout/collapsed-sidebar.html" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>AUPD Plating</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="pages/layout/collapsed-sidebar.html" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>Cleaning</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="pages/layout/collapsed-sidebar.html" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>TI NI AU Plating</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="pages/layout/collapsed-sidebar.html" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>Lead Cutting</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="pages/layout/collapsed-sidebar.html" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>Camber INSP.</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="pages/layout/collapsed-sidebar.html" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>S DIST INSP</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="pages/layout/collapsed-sidebar.html" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>Camber INSP.All</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="pages/layout/collapsed-sidebar.html" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>INSP.5</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="pages/layout/collapsed-sidebar.html" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>RE-SCR.5</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="pages/layout/collapsed-sidebar.html" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>INSP.6</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="pages/layout/collapsed-sidebar.html" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>RE-SCR.6</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="pages/layout/collapsed-sidebar.html" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>S.QC</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="pages/layout/collapsed-sidebar.html" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>S.Airblow</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="pages/layout/collapsed-sidebar.html" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>Send to AMA</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="pages/layout/collapsed-sidebar.html" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>Short3</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="pages/layout/collapsed-sidebar.html" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>QA</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="pages/layout/collapsed-sidebar.html" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>Storage</p>
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="pages/layout/collapsed-sidebar.html" class="nav-link">
-                                        <i class="far fa-circle nav-icon"></i>
-                                        <p>Shipping</p>
-                                    </a>
-                                </li>
-                                
+
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="far fa-circle nav-icon"></i>20102 - 1000 Sinter
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                            <a class="dropdown-item" asp-controller="ThousandSinter" asp-action="Index" style="color: #007bff;">Sinter Waiting List</a>
+                                            <a class="dropdown-item" asp-controller="ThousandSinter" asp-action="Index1" style="color: #28a745;">1000 Sinter Details</a>
+                                        </div>
+                                    </li>
+
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="far fa-circle nav-icon"></i>20105 - Breaking
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                            <a class="dropdown-item" asp-controller="Breaking" asp-action="Index" style="color: #007bff;"> Waiting List</a>
+                                            <a class="dropdown-item" asp-controller="Breaking" asp-action="Index1" style="color: #28a745;"> Details</a>
+                                        </div>
+                                    </li>
+
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="far fa-circle nav-icon"></i>20109 - Camber
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                            <a class="dropdown-item" asp-controller="Camber" asp-action="Index" style="color: #007bff;"> Waiting List</a>
+                                            <a class="dropdown-item" asp-controller="Camber" asp-action="Index1" style="color: #28a745;"> Details</a>
+                                        </div>
+                                    </li>
+
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="far fa-circle nav-icon"></i>20110 - S-Dist Select
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                            <a class="dropdown-item" asp-controller="SDistSelect" asp-action="Index" style="color: #007bff;"> Waiting List</a>
+                                            <a class="dropdown-item" asp-controller="SDistSelect" asp-action="Index1" style="color: #28a745;"> Details</a>
+                                        </div>
+                                    </li>
+
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="far fa-circle nav-icon"></i>20199 - Burr Remove
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                            <a class="dropdown-item" asp-controller="BurrRemove" asp-action="Index" style="color: #007bff;"> Waiting List</a>
+                                            <a class="dropdown-item" asp-controller="BurrRemove" asp-action="Index1" style="color: #28a745;"> Details</a>
+                                        </div>
+                                    </li>
+
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="far fa-circle nav-icon"></i>20200 - Insp2
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                            <a class="dropdown-item" asp-controller="Insp2" asp-action="Index" style="color: #007bff;"> Waiting List</a>
+                                            <a class="dropdown-item" asp-controller="Insp2" asp-action="Index1" style="color: #28a745;"> Details</a>
+                                        </div>
+                                    </li>
+
+                                     <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="far fa-circle nav-icon"></i>20201 - MQC
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                            <a class="dropdown-item" asp-controller="MQC" asp-action="Index" style="color: #007bff;"> Waiting List</a>
+                                            <a class="dropdown-item" asp-controller="MQC" asp-action="Index1" style="color: #28a745;"> Details</a>
+                                        </div>
+                                    </li>
+
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="far fa-circle nav-icon"></i>20202 - Ni Plating
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                            <a class="dropdown-item" asp-controller="NiPlating" asp-action="Index" style="color: #007bff;"> Waiting List</a>
+                                            <a class="dropdown-item" asp-controller="NiPlating" asp-action="Index1" style="color: #28a745;"> Details</a>
+                                        </div>
+                                    </li>
+
+                                       <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="far fa-circle nav-icon"></i>20203 - Ni Plating2
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                            <a class="dropdown-item" asp-controller="NiPlating2" asp-action="Index" style="color: #007bff;"> Waiting List</a>
+                                            <a class="dropdown-item" asp-controller="NiPlating2" asp-action="Index1" style="color: #28a745;"> Details</a>
+                                        </div>
+                                    </li>
+                                      
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="far fa-circle nav-icon"></i>20204 - Agcuset
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                            <a class="dropdown-item" asp-controller="Agcuset" asp-action="Index" style="color: #007bff;"> Waiting List</a>
+                                            <a class="dropdown-item" asp-controller="Agcuset" asp-action="Index1" style="color: #28a745;"> Details</a>
+                                        </div>
+                                    </li>
+                                       <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="far fa-circle nav-icon"></i>20205 - Brazing
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                            <a class="dropdown-item" asp-controller="Brazing" asp-action="Index" style="color: #007bff;"> Waiting List</a>
+                                            <a class="dropdown-item" asp-controller="Brazing" asp-action="Index1" style="color: #28a745;"> Details</a>
+                                        </div>
+                                    </li>
+                                       <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="far fa-circle nav-icon"></i>20209 - I-Ki Etching
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                            <a class="dropdown-item" asp-controller="IKiEtching" asp-action="Index" style="color: #007bff;"> Waiting List</a>
+                                            <a class="dropdown-item" asp-controller="IKiEtching" asp-action="Index1" style="color: #28a745;"> Details</a>
+                                        </div>
+                                    </li>
+                                       <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="far fa-circle nav-icon"></i>20211 - Rough Ni Plating
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                            <a class="dropdown-item" asp-controller="RoughNiPlating" asp-action="Index" style="color: #007bff;"> Waiting List</a>
+                                            <a class="dropdown-item" asp-controller="RoughNiPlating" asp-action="Index1" style="color: #28a745;"> Details</a>
+                                        </div>
+                                    </li>
+                                       <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="far fa-circle nav-icon"></i>20213 - Ni Plating3
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                            <a class="dropdown-item" asp-controller="NiPlating3" asp-action="Index" style="color: #007bff;"> Waiting List</a>
+                                            <a class="dropdown-item" asp-controller="NiPlating3" asp-action="Index1" style="color: #28a745;"> Details</a>
+                                        </div>
+                                    </li>
+                                       <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="far fa-circle nav-icon"></i>20215 - Ni Plating4
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                            <a class="dropdown-item" asp-controller="NiPlating4" asp-action="Index" style="color: #007bff;"> Waiting List</a>
+                                            <a class="dropdown-item" asp-controller="NiPlating4" asp-action="Index1" style="color: #28a745;"> Details</a>
+                                        </div>
+                                    </li>
+                                       <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="far fa-circle nav-icon"></i>20217 - 750 Sinter1
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                            <a class="dropdown-item" asp-controller="Sinter1" asp-action="Index" style="color: #007bff;"> Waiting List</a>
+                                            <a class="dropdown-item" asp-controller="Sinter1" asp-action="Index1" style="color: #28a745;"> Details</a>
+                                        </div>
+                                    </li>
+                                       <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="far fa-circle nav-icon"></i>20218 - S-Grinding
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                            <a class="dropdown-item" asp-controller="SGrinding" asp-action="Index" style="color: #007bff;"> Waiting List</a>
+                                            <a class="dropdown-item" asp-controller="SGrinding" asp-action="Index1" style="color: #28a745;"> Details</a>
+                                        </div>
+                                    </li>
+                                     <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="far fa-circle nav-icon"></i>20219 - Ni Plating5
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                            <a class="dropdown-item" asp-controller="NiPlating5" asp-action="Index" style="color: #007bff;"> Waiting List</a>
+                                            <a class="dropdown-item" asp-controller="NiPlating5" asp-action="Index1" style="color: #28a745;"> Details</a>
+                                        </div>
+                                    </li>
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="far fa-circle nav-icon"></i>20221 - 750 Sinter2
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                            <a class="dropdown-item" asp-controller="Sinter2" asp-action="Index" style="color: #007bff;"> Waiting List</a>
+                                            <a class="dropdown-item" asp-controller="Sinter2" asp-action="Index1" style="color: #28a745;"> Details</a>
+                                        </div>
+                                    </li>
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="far fa-circle nav-icon"></i>20222 - S-Subcon-In
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                            <a class="dropdown-item" asp-controller="SubconIn" asp-action="Index" style="color: #007bff;"> Waiting List</a>
+                                            <a class="dropdown-item" asp-controller="SubconIn" asp-action="Index1" style="color: #28a745;"> Details</a>
+                                        </div>
+                                    </li>
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="far fa-circle nav-icon"></i>20223 - S-Subcon-Out
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                            <a class="dropdown-item" asp-controller="SubconOut" asp-action="Index" style="color: #007bff;"> Waiting List</a>
+                                            <a class="dropdown-item" asp-controller="SubconOut" asp-action="Index1" style="color: #28a745;"> Details</a>
+                                        </div>
+                                    </li>
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="far fa-circle nav-icon"></i>20224 - MQC2
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                            <a class="dropdown-item" asp-controller="MQC2" asp-action="Index" style="color: #007bff;"> Waiting List</a>
+                                            <a class="dropdown-item" asp-controller="MQC2" asp-action="Index1" style="color: #28a745;"> Details</a>
+                                        </div>
+                                    </li>
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="far fa-circle nav-icon"></i>20225 - Pressing
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                            <a class="dropdown-item" asp-controller="Pressing" asp-action="Index" style="color: #007bff;"> Waiting List</a>
+                                            <a class="dropdown-item" asp-controller="Pressing" asp-action="Index1" style="color: #28a745;"> Details</a>
+                                        </div>
+                                    </li>
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="far fa-circle nav-icon"></i>20227 - Gaug Select
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                            <a class="dropdown-item" asp-controller="GaugSelect" asp-action="Index" style="color: #007bff;"> Waiting List</a>
+                                            <a class="dropdown-item" asp-controller="GaugSelect" asp-action="Index1" style="color: #28a745;"> Details</a>
+                                        </div>
+                                    </li>
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="far fa-circle nav-icon"></i>20229 - Au Plating1
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                            <a class="dropdown-item" asp-controller="AuPlating1" asp-action="Index" style="color: #007bff;"> Waiting List</a>
+                                            <a class="dropdown-item" asp-controller="AuPlating1" asp-action="Index1" style="color: #28a745;"> Details</a>
+                                        </div>
+                                    </li>
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="far fa-circle nav-icon"></i>20231 - Au Plating2
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                            <a class="dropdown-item" asp-controller="AuPlating2" asp-action="Index" style="color: #007bff;"> Waiting List</a>
+                                            <a class="dropdown-item" asp-controller="AuPlating2" asp-action="Index1" style="color: #28a745;"> Details</a>
+                                        </div>
+                                    </li>
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="far fa-circle nav-icon"></i>20232 - Aupd Plating
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                            <a class="dropdown-item" asp-controller="AupdPlating" asp-action="Index" style="color: #007bff;"> Waiting List</a>
+                                            <a class="dropdown-item" asp-controller="AupdPlating" asp-action="Index1" style="color: #28a745;"> Details</a>
+                                        </div>
+                                    </li>
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="far fa-circle nav-icon"></i>20233 - Cleaning
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                            <a class="dropdown-item" asp-controller="Cleaning" asp-action="Index" style="color: #007bff;"> Waiting List</a>
+                                            <a class="dropdown-item" asp-controller="Cleaning" asp-action="Index1" style="color: #28a745;"> Details</a>
+                                        </div>
+                                    </li>
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="far fa-circle nav-icon"></i>20235 - Ti Ni Au Plating
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                            <a class="dropdown-item" asp-controller="TiNiAuPlating" asp-action="Index" style="color: #007bff;"> Waiting List</a>
+                                            <a class="dropdown-item" asp-controller="TiNiAuPlating" asp-action="Index1" style="color: #28a745;"> Details</a>
+                                        </div>
+                                    </li>
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="far fa-circle nav-icon"></i>20237 - Lead Cutting
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                            <a class="dropdown-item" asp-controller="LeadCutting" asp-action="Index" style="color: #007bff;"> Waiting List</a>
+                                            <a class="dropdown-item" asp-controller="LeadCutting" asp-action="Index1" style="color: #28a745;"> Details</a>
+                                        </div>
+                                    </li>
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="far fa-circle nav-icon"></i>20241 - Camber Insp
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                            <a class="dropdown-item" asp-controller="CamberInsp" asp-action="Index" style="color: #007bff;"> Waiting List</a>
+                                            <a class="dropdown-item" asp-controller="CamberInsp" asp-action="Index1" style="color: #28a745;"> Details</a>
+                                        </div>
+                                    </li>
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="far fa-circle nav-icon"></i>20242 - S Dist Insp
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                            <a class="dropdown-item" asp-controller="SDistInsp" asp-action="Index" style="color: #007bff;"> Waiting List</a>
+                                            <a class="dropdown-item" asp-controller="SDistInsp" asp-action="Index1" style="color: #28a745;"> Details</a>
+                                        </div>
+                                    </li>
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="far fa-circle nav-icon"></i>20243 - Camber Insp.All
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                            <a class="dropdown-item" asp-controller="CamberInspAll" asp-action="Index" style="color: #007bff;"> Waiting List</a>
+                                            <a class="dropdown-item" asp-controller="CamberInspAll" asp-action="Index1" style="color: #28a745;"> Details</a>
+                                        </div>
+                                    </li>
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="far fa-circle nav-icon"></i>20301 - Insp.4
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                            <a class="dropdown-item" asp-controller="Insp4" asp-action="Index" style="color: #007bff;"> Waiting List</a>
+                                            <a class="dropdown-item" asp-controller="Insp4" asp-action="Index1" style="color: #28a745;"> Details</a>
+                                        </div>
+                                    </li>
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="far fa-circle nav-icon"></i>20302 - Re-Scr.4
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                            <a class="dropdown-item" asp-controller="ReScr4" asp-action="Index" style="color: #007bff;"> Waiting List</a>
+                                            <a class="dropdown-item" asp-controller="ReScr4" asp-action="Index1" style="color: #28a745;"> Details</a>
+                                        </div>
+                                    </li>
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="far fa-circle nav-icon"></i>20219 - Ni Plating5
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                            <a class="dropdown-item" asp-controller="NiPlating5" asp-action="Index" style="color: #007bff;"> Waiting List</a>
+                                            <a class="dropdown-item" asp-controller="NiPlating5" asp-action="Index1" style="color: #28a745;"> Details</a>
+                                        </div>
+                                    </li>
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="far fa-circle nav-icon"></i>20405 - Re-Pressing
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                            <a class="dropdown-item" asp-controller="RePressing" asp-action="Index" style="color: #007bff;"> Waiting List</a>
+                                            <a class="dropdown-item" asp-controller="RePressing" asp-action="Index1" style="color: #28a745;"> Details</a>
+                                        </div>
+                                    </li>
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="far fa-circle nav-icon"></i>20406 - Re2-Pressing
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                            <a class="dropdown-item" asp-controller="Re2Pressing" asp-action="Index" style="color: #007bff;"> Waiting List</a>
+                                            <a class="dropdown-item" asp-controller="Re2Pressing" asp-action="Index1" style="color: #28a745;"> Details</a>
+                                        </div>
+                                    </li>
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="far fa-circle nav-icon"></i>20408 - Insp.5
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                            <a class="dropdown-item" asp-controller="Insp5" asp-action="Index" style="color: #007bff;"> Waiting List</a>
+                                            <a class="dropdown-item" asp-controller="Insp5" asp-action="Index1" style="color: #28a745;"> Details</a>
+                                        </div>
+                                    </li>
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="far fa-circle nav-icon"></i>20409 - Re-Scr.5
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                            <a class="dropdown-item" asp-controller="ReScr5" asp-action="Index" style="color: #007bff;"> Waiting List</a>
+                                            <a class="dropdown-item" asp-controller="ReScr5" asp-action="Index1" style="color: #28a745;"> Details</a>
+                                        </div>
+                                    </li>
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="far fa-circle nav-icon"></i>20411 - Insp.6
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                            <a class="dropdown-item" asp-controller="Insp6" asp-action="Index" style="color: #007bff;"> Waiting List</a>
+                                            <a class="dropdown-item" asp-controller="Insp6" asp-action="Index1" style="color: #28a745;"> Details</a>
+                                        </div>
+                                    </li>
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="far fa-circle nav-icon"></i>20413 - Re-Scr.6
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                            <a class="dropdown-item" asp-controller="ReScr6" asp-action="Index" style="color: #007bff;"> Waiting List</a>
+                                            <a class="dropdown-item" asp-controller="ReScr6" asp-action="Index1" style="color: #28a745;"> Details</a>
+                                        </div>
+                                    </li>
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="far fa-circle nav-icon"></i>20415 - S.Qc
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                            <a class="dropdown-item" asp-controller="SQc" asp-action="Index" style="color: #007bff;"> Waiting List</a>
+                                            <a class="dropdown-item" asp-controller="SQc" asp-action="Index1" style="color: #28a745;"> Details</a>
+                                        </div>
+                                    </li>
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="far fa-circle nav-icon"></i>20417 - S.Airblow
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                            <a class="dropdown-item" asp-controller="SAirblow" asp-action="Index" style="color: #007bff;"> Waiting List</a>
+                                            <a class="dropdown-item" asp-controller="SAirblow" asp-action="Index1" style="color: #28a745;"> Details</a>
+                                        </div>
+                                    </li>
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="far fa-circle nav-icon"></i>25181 - Send to AMA
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                            <a class="dropdown-item" asp-controller="SendtoAMA" asp-action="Index" style="color: #007bff;"> Waiting List</a>
+                                            <a class="dropdown-item" asp-controller="SendtoAMA" asp-action="Index1" style="color: #28a745;"> Details</a>
+                                        </div>
+                                    </li>
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="far fa-circle nav-icon"></i>73008 - Short3
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                            <a class="dropdown-item" asp-controller="Short3" asp-action="Index" style="color: #007bff;"> Waiting List</a>
+                                            <a class="dropdown-item" asp-controller="Short3" asp-action="Index1" style="color: #28a745;"> Details</a>
+                                        </div>
+                                    </li>
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="far fa-circle nav-icon"></i>90001 - QA
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                            <a class="dropdown-item" asp-controller="QA" asp-action="Index" style="color: #007bff;"> Waiting List</a>
+                                            <a class="dropdown-item" asp-controller="QA" asp-action="Index1" style="color: #28a745;"> Details</a>
+                                        </div>
+                                    </li>
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="far fa-circle nav-icon"></i>95001 - Storage
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                            <a class="dropdown-item" asp-controller="Storage" asp-action="Index" style="color: #007bff;"> Waiting List</a>
+                                            <a class="dropdown-item" asp-controller="Storage" asp-action="Index1" style="color: #28a745;"> Details</a>
+                                        </div>
+                                    </li>
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <i class="far fa-circle nav-icon"></i>96001 - Shipping
+                                        </a>
+                                        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                            <a class="dropdown-item" asp-controller="Shipping" asp-action="Index" style="color: #007bff;"> Waiting List</a>
+                                            <a class="dropdown-item" asp-controller="Shipping" asp-action="Index1" style="color: #28a745;"> Details</a>
+                                        </div>
+                                    </li>
                             </ul>
                         </li>
 
@@ -493,91 +702,75 @@
                             </ul>
                         </li>
                        
-                        <li class="nav-header">USER LOGIN</li>
+                        <li class="nav-header">USER</li>
                         <li class="nav-item">
                             <a href="#" class="nav-link">
                                 <i class="nav-icon fas fa-user"></i>
                                 <p>
-                                   Login & Register
+                                  User Management 
                                     <i class="fas fa-angle-left right"></i>
                                 </p>
                             </a>
                             <ul class="nav nav-treeview">
                                 <li class="nav-item">
-                                    <a href="#" class="nav-link">
+                                        <a asp-controller="Users" asp-action="Index" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
-                                        <p>Login </p>
+                                        <p>Employee Register </p>
                                     </a>
+
                                 </li>
                                 <li class="nav-item">
-                                    <a href="#" class="nav-link">
+                                        <a asp-controller="Department" asp-action="Index" class="nav-link">
                                         <i class="far fa-circle nav-icon"></i>
-                                        <p>Register</p>
+                                        <p>Department Register</p>
                                     </a>
                                 </li>
                              
                             </ul>
                         </li>
-                       
+                    }
                     </ul>
                 </nav>
                 <!-- /.sidebar-menu -->
             </div>
             <!-- /.sidebar -->
-        </aside>
-
+            </aside>
+      
         <div class="content-wrapper">
-            <!-- Content Header (Page header) -->
-            <div class="content-header">
                 <div class="container-fluid">
-                    <div class="row mb-2">
-                        <div class="col-sm-6">
-                            <h1 class="m-0"></h1>
-                        </div><!-- /.col -->
-                        <div class="col-sm-6">
-                            <ol class="breadcrumb float-sm-right">
-                                <li class="breadcrumb-item"><a href="#">Home</a></li>
-                                <li class="breadcrumb-item active">Dashboard v1</li>
-                            </ol>
-                        </div><!-- /.col -->
-                    </div><!-- /.row -->
-                </div><!-- /.container-fluid -->
-            </div>
-
-            <!-- /.content-header -->
-
-            <main role="main" class="content">
-                <div class="container-fluid">
-                   
-                    @RenderBody()
+                    <div class="row">
+                        <div class="">
+                            @RenderBody()
+                        </div>
+                    </div>
                 </div>
-            </main>
         </div>
         <!-- /.content-wrapper -->
-         <div class="container-fluid">
-        <main role="main" class="pb-3">
-@*                 <breadcrumb></breadcrumb> *@
-            @RenderBody()
-
-               @*  <!-- Potentially other script files -->
-                @RenderSection("Scripts", required: false) *@
-
-        </main>
-    </div>
-        <footer class="main-footer no-print">
-            <strong>Copyright &copy;2023 <a href="https://adminlte.io">WIPSystem.Web</a>.</strong>
-            All rights reserved.
-            <div class="float-right d-none d-sm-inline-block">
-                <b>Version</b> 1.0
-            </div>
-        </footer>
-
-
+      
         <!-- Control Sidebar -->
         <aside class="control-sidebar control-sidebar-dark">
             <!-- Control sidebar content goes here -->
         </aside>
         <!-- /.control-sidebar -->
+    </div>
+
+   
+    }
+    else
+    {
+
+    }
+    <div class="content-wrapper">
+    <div class="container-fluid">
+    <main role="main" class="content">
+        <div class="container-fluid">
+            @RenderBody()
+        </div>
+    </main>
+    </div>
+    </div>
+    <div class="navbar navbar-inverse fixed-bottom" style="margin-left: 1500px; padding: 10px;">
+        <p class="text-muted">NGK Electronics Devices (m) Sdn. Bhd - WIP SYSTEM version 1.0</p>
     </div>
     <!-- ./wrapper -->
     <!-- jQuery -->
@@ -615,17 +808,21 @@
     <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
     <script src="~/dist/js/pages/dashboard.js"></script>
    
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
     <script src="//cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.js"></script>
+<script src="~/dist/js/datatables.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
  
 
     @await RenderSectionAsync("Scripts", required: false)

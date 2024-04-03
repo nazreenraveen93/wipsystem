@@ -1,0 +1,74 @@
+﻿@model WIPSystem.Web.ViewModel.LotSplitViewModel
+
+<!-- Modal -->
+<div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detailsModalLabel">Details of Split Lot</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-3 p-3" style="border: 2px solid #dee2e6; border-radius: 0.25rem;">
+                    <!-- EmpNo -->
+                    <div class="col-md-6">
+                        <label class="form-label">Employee Number</label>
+                        <input type="text" class="form-control" value="@Model.EmpNo" readonly />
+                    </div>
+
+                    <!-- SelectedPartNo -->
+                    <div class="col-md-6">
+                        <label class="form-label">Selected Part No</label>
+                        <input type="text" class="form-control" value="@Model.SelectedPartNo" readonly />
+                    </div>
+
+                    <!-- OriginalLot -->
+                    <div class="col-md-4">
+                        <label class="form-label">Original Lot</label>
+                        <input type="text" class="form-control" value="@Model.OriginalLot" readonly />
+                    </div>
+
+                     <!-- ProcessName -->
+                    <div class="col-md-4">
+                        <label class="form-label">Split under Process</label>
+                        <input type="text" class="form-control" value="@Model.ProcessName" readonly />
+                    </div>
+
+                    <!-- Quantity -->
+                    <div class="col-md-4">
+                        <label class="form-label">Initial Quantity</label>
+                        <input type="number" class="form-control" value="@Model.Quantity" readonly />
+                    </div>
+
+                    <!-- SplitDetails Table -->
+                    <div class="col-md-12 mt-3">
+                        <label class="form-label">Split Details</label>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                   
+                                    <th>Lot Number</th>
+                                    <th>Quantity</th>
+                                    <th>Camber</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var detail in Model.SplitDetails)
+                                {
+                                    <tr>
+                                       
+                                        <td>@detail.LotNumber</td>
+                                        <td>@detail.Quantity</td>
+                                        <td>@detail.Camber</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

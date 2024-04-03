@@ -1,0 +1,66 @@
+﻿@model WIPSystem.Web.Models.UserEntity
+
+@{
+    ViewData["Title"] = "Edit User Informations";
+}
+<div class="container-fluid" style="margin-top: 20px;">
+    <div class="row justify-content-center">
+        <div class=" col-lg-6 col-md-8">
+          <div class="card p-3">
+             <div class="row justify-content-center">
+                 <div class="col-12">
+                        <h2 class="heading text-center">Edit User Information</h2>
+                 </div>
+                </div>
+             <div class="row justify-content-center">
+                <div class="col-md-12 border-10 border" style="background-color: white;">
+                 <div class="col-md-12">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="UserId" />
+            <div class="form-group">
+                <label asp-for="username" class="control-label">Username</label>
+                <input asp-for="username" class="form-control" />
+                <span asp-validation-for="username" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="password" class="control-label">Password</label>
+                <input asp-for="password" class="form-control" />
+                <span asp-validation-for="password" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Email" class="control-label">Email</label>
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="employeeNo" class="control-label">Employee No</label>
+                <input asp-for="employeeNo" class="form-control" />
+                <span asp-validation-for="employeeNo" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DepartmentId" class="control-label">Department ID</label>
+                <select asp-for="DepartmentId" class="form-control" asp-items="ViewBag.DepartmentId"></select>
+                <span asp-validation-for="DepartmentId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Update" class="btn btn-warning" />
+                <!-- Back Button -->
+                <button type="button" class="btn btn-secondary" onclick="window.history.back();">Back</button>
+                      
+            </div>
+        </form>
+    </div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div>
+</div>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

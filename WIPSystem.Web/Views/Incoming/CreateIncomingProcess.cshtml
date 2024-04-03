@@ -1,0 +1,158 @@
+﻿@model WIPSystem.Web.ViewModel.IncomingProcessViewModel
+
+@{
+    ViewBag.Title = "Incoming Process";
+}
+
+<div class="container">
+    <h2 class="text-uppercase text-center">Incoming Process </h2>
+    <br />
+    <div class="row">
+        <div class="col-md-12">
+            <form asp-controller="Incoming" asp-action="CreateIncomingProcess" method="post" class="row g-3 p-3" style="border: 2px solid #dee2e6; border-radius: 0.25rem;">
+                <div class="col-md-12 mb-3">
+                    <div id="ProcessCurrentStatus" class="p-2 text-white text-center" style="background-color: #dc3545; border-radius: 0.25rem; font-weight: bold; font-size: 24px;">Incoming</div>
+                </div>
+
+                <!-- Additional fields in a horizontal layout -->
+                <div class="col-md-6">
+                    <label asp-for="PartNo" class="form-label">Part No</label>
+                    <select asp-for="PartNo" asp-items="Model.PartNos" class="form-select" id="partNoDropdown">
+                        <option value="">-- Select Part No --</option>
+                    </select>
+                </div>
+               
+                <!-- Add placeholders for CustomerName, PackageSize, and PiecePerBlank -->
+                <div class="col-md-6">
+                    <label asp-for="CustomerName" class="form-label">Customer Name</label>
+                    <input asp-for="CustomerName" class="form-control" readonly />
+                    <input type="hidden" asp-for="CustomerName" />
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="PackageSize" class="form-label">Package Size</label>
+                    <input asp-for="PackageSize" class="form-control" readonly />
+                    <input type="hidden" asp-for="PackageSize" />
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="PiecePerBlank" class="form-label">Piece Per Blank</label>
+                    <input asp-for="PiecePerBlank" class="form-control" readonly />
+                    <input type="hidden" asp-for="PiecePerBlank" />
+                </div>
+
+
+                <div class="col-md-4">
+                    <label asp-for="LotNo" class="form-label">Lot No</label>
+                    <select asp-for="LotNo" class="form-select" asp-items="Model.LotNos">
+                        <option value="">-- Select Lot No --</option>
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="ReceivedQuantity" class="form-label">Received Quantity</label>
+                    <input asp-for="ReceivedQuantity" class="form-control" type="number" />
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="Status" class="form-label">Status</label>
+                    <select asp-for="Status" class="form-select">
+                        @foreach (var status in Enum.GetValues(typeof(WIPSystem.Web.Models.IncomingProcessStatus)))
+                        {
+                            <option value="@((int)status)">@status.ToString()</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="Remarks" class="form-label">Remarks</label>
+                    <textarea asp-for="Remarks" class="form-control" rows="3"></textarea>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="CheckedBy" class="form-label">Issued By</label>
+                    <input asp-for="CheckedBy" class="form-control" id="checkedByInput" readonly />
+                </div>
+
+                <div class="col-12 text-center">
+                    <div style="width: 50%; margin: 0 auto;">
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                        <!-- Back Button -->
+                        <button type="button" class="btn btn-secondary" onclick="window.history.back();">Back</button>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script>
+        $(function () {
+            // Attach change event handler to the PartNo dropdown
+            $('#partNoDropdown').change(function () {
+                var selectedPartNo = $(this).val();
+                if (selectedPartNo) {
+                    // Make an AJAX request to GetProductDetails action
+                    $.ajax({
+                        url: '@Url.Action("GetProductDetails", "Incoming")',
+                        type: 'GET',
+                        data: { partNo: selectedPartNo },
+                        success: function (data) {
+                            // Update the fields with the retrieved data
+                            $('#CustomerName').val(data.customerName);
+                            $('#PackageSize').val(data.packageSize);
+                            $('#PiecePerBlank').val(data.piecePerBlank);
+                            // Update the hidden ProductId field
+                            $('#ProductId').val(data.productId); // Assuming 'data.productId' is the received ProductId
+                        },
+                        error: function () {
+                            // Handle error if needed
+                            alert('Error retrieving product details.');
+                        }
+                    });
+                } else {
+                    // Clear the fields if no PartNo is selected
+                    $('#CustomerName').val('');
+                    $('#PackageSize').val('');
+                    $('#PiecePerBlank').val('');
+
+
+                }
+            });
+        });
+        // This function handles the QR code data and updates the fields
+        function handleQRDataInput(scannedText) {
+            var data = parseQRCodeData(scannedText);
+            fetchProductDetails(data.PartNo); // Fetch and update using the Part No from QR code
+        }
+
+        // This function parses the QR code string and returns an object
+        function parseQRCodeData(scannedText) {
+            var data = {};
+            var parts = scannedText.split('|');
+            parts.forEach(function (part) {
+                var item = part.split(':');
+                if (item.length === 2) {
+                    data[item[0].trim()] = item[1].trim();
+                }
+            });
+            return data;
+        }
+       
+
+        $(document).ready(function () {
+            // Event listener for the Part No dropdown changes
+            $('#IncomingProcess_PartNo').on('change', function () {
+                var partNo = $(this).val();
+                fetchProductDetails(partNo); // Fetch and update on dropdown change
+            });
+
+            // Event listener for the QR code input field
+            // Make sure you replace 'qrInputField' with the ID of the field that receives the QR code data
+            $('#qrInputField').on('change', handleQRDataInput);
+
+                      
+        });
+    </script>
+}

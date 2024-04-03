@@ -1,0 +1,67 @@
+﻿@model MachineJigViewModel
+
+@{
+
+    ViewBag.Title = "Create Machine";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="text-uppercase text-center">Register Machine</h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 border-1 border">
+            <form asp-action="CreateMachineAndJig" method="post">
+                @Html.AntiForgeryToken()
+                <div class="mb-3">
+                    <label asp-for="SelectedProcessId" class="control-label"></label>
+                    <select asp-for="SelectedProcessId" asp-items="Model.Processes" class="form-control"></select>
+                    <span asp-validation-for="SelectedProcessId" class="text-danger"></span>
+                </div>
+
+
+                <div class="mb-3">
+                    <label asp-for="MachineName" class="control-label"></label>
+                    <input asp-for="MachineName" class="form-control" />
+                    <span asp-validation-for="MachineName" class="text-danger"></span>
+                </div>
+
+
+                <div class="mb-3">
+                    <label asp-for="MachineNumber" class="control-label"></label>
+                    <input asp-for="MachineNumber" class="form-control" />
+                    <span asp-validation-for="MachineNumber" class="text-danger"></span>
+                </div>
+
+
+                <div class="mb-3">
+                    <label asp-for="MachineQuantity" class="control-label"></label>
+                    <input asp-for="MachineQuantity" type="number" class="form-control" />
+                    <span asp-validation-for="MachineQuantity" class="text-danger"></span>
+                </div>
+
+
+                <div class="mb-3">
+                    <label asp-for="JigName" class="control-label"></label>
+                    <input asp-for="JigName" class="form-control" />
+                    <span asp-validation-for="JigName" class="text-danger"></span>
+                </div>
+
+
+                <div class="mb-3">
+                    <label asp-for="JigLifeSpan" class="control-label"></label>
+                    <input asp-for="JigLifeSpan" type="number" class="form-control" />
+                    <span asp-validation-for="JigLifeSpan" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <input type="submit" value="Submit" class="btn btn-primary" />
+                    <button type="button" onclick="history.back();" class="btn btn-secondary">Back</button>
+                </div>
+
+            </form>
+        </div>
+    </div>  
+</div>

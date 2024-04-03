@@ -1,0 +1,37 @@
+﻿@model WIPSystem.Web.Models.Department
+
+@{
+    ViewBag.Title = "Edit Department";
+}
+<div class="container-fluid" style="margin-top: 20px;">
+    <div class="row justify-content-center">
+        <div class=" col-lg-6 col-md-8">
+            <div class="card p-3">
+                <div class="row justify-content-center">
+                    <div class="col-12">
+                        <h2 class="heading text-center">Edit Department</h2>
+                    </div>
+                </div>
+                <div class="row justify-content-center">
+                    <div class="col-md-12 border-10 border" style="background-color: white;">
+                        <div class="col-md-12">
+                            <form asp-action="Edit">
+                                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                <input type="hidden" asp-for="DepartmentId" />
+                                <div class="form-group">
+                                    <label asp-for="DepartmentName" class="control-label"></label>
+                                    <input asp-for="DepartmentName" class="form-control" />
+                                    <span asp-validation-for="DepartmentName" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <input type="submit" value="Save" class="btn btn-primary" />
+                                    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,126 @@
+﻿@model WIPSystem.Web.Models.UserEntity
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<div class="container-fluid" style="margin-top: 20px;">
+    <div class="row justify-content-center">
+        <div class=" col-lg-6 col-md-8">
+            <div class="card p-3">
+                <div class="row justify-content-center">
+                    <div class="col-12">
+                        <h2 class="heading text-center">Register New User</h2>
+                    </div>
+                </div>
+        <div class="row justify-content-center">
+            <div class="col-md-12 border-10 border" style="background-color: white;">
+    <div class="col-md-12">
+        <form asp-action="Create" >
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="username" class="control-label">Username</label>
+                <input asp-for="username" class="form-control" />
+                <span asp-validation-for="username" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="password" class="control-label">Password</label>
+                <input asp-for="password" class="form-control" />
+                <span asp-validation-for="password" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="employeeNo" class="control-label">Employee No</label>
+                <input asp-for="employeeNo" class="form-control" />
+                <span asp-validation-for="employeeNo" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Role" class="control-label">User Role</label>
+                <select asp-for="Role" class="form-control" asp-items="ViewBag.Roles" id="Role"></select>
+            </div>
+
+            <div class="form-group" id="emailField" style="display:none;">
+               <div class="alert alert-danger" role="alert">
+                 Please enter an email address ending with @@ngked.co.jp"
+               </div>
+                <label asp-for="Email" class="control-label">Email</label>
+                <input asp-for="Email" class="form-control" placeholder="@@ngked.co.jp" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+             </div>
+
+            <div class="form-group">
+                <label asp-for="DepartmentId" class="control-label">Deparrment Name</label>
+                <select asp-for="DepartmentId" class="form-control" asp-items="ViewBag.DepartmentName"></select>
+            </div>
+            
+            <div class="form-group">
+                <label asp-for="ProcessId" class="control-label">Process Name</label>
+                <select asp-for="ProcessId" class="form-control" asp-items="ViewBag.Processes" id="ProcessId"></select>
+                <span asp-validation-for="ProcessId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+                <!-- Back Button -->
+                <button type="button" class="btn btn-secondary" onclick="window.history.back();">Back</button>
+            </div>
+        </form>
+    </div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Function to enable/disable ProcessId dropdown based on the selected role
+            function toggleProcessDropdown() {
+                var selectedRole = $('#Role').val();
+                if (selectedRole === 'Super Admin') {
+                    // Disable ProcessId dropdown only for Super Admin
+                    $('#ProcessId').prop('disabled', true);
+                    alert('The Super Admin role is for MIS-Developer\'s ONLY.');
+                } else {
+                    // Enable ProcessId dropdown for other roles, including Admin
+                    $('#ProcessId').prop('disabled', false);
+                }
+            }
+
+            // Run the function on page load
+            toggleProcessDropdown();
+
+            // Set up event handler for when the Role dropdown changes
+            $('#Role').change(toggleProcessDropdown);
+        });
+
+        $(document).ready(function () {
+            // Function to show/hide email input field based on role selection
+            function toggleEmailField() {
+                var selectedRole = $('#Role').val();
+                if (selectedRole === 'Admin'|| selectedRole === 'Super Admin') {
+                    $('#emailField').show();
+                } else {
+                    $('#emailField').hide();
+                }
+            }
+
+            // Run the function on page load
+            toggleEmailField();
+
+            // Set up event handler for when the Role dropdown changes
+            $('#Role').change(toggleEmailField);
+
+            // Set up event handler for form submission
+            $('form').submit(function () {
+                var selectedRole = $('#Role').val();
+                var emailValue = $('#email').val();
+                if ((selectedRole === 'Admin' || selectedRole === 'Super Admin') && !emailValue.endsWith('@@ngked.co.jp')) {
+                    alert('Please enter an email address ending with @@ngked.co.jp');
+                    return false; // Prevent form submission
+                }
+            });
+        });
+    </script>
+
+}

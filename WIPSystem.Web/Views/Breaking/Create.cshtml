@@ -1,0 +1,353 @@
+﻿@using System.Reflection
+@using System.ComponentModel.DataAnnotations
+
+
+@model BreakingViewModel
+@{
+    ViewData["Title"] = "Breaking Process";
+}
+
+<div class="container">
+    <h2 class="text-uppercase text-center">Breaking Process </h2>
+    <br />
+    <!-- Display validation errors here -->
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger" role="alert">
+            @foreach (var item in ViewData.ModelState.Values)
+            {
+                foreach (var error in item.Errors)
+                {
+                    <p>@error.ErrorMessage</p>
+                }
+            }
+        </div>
+    }
+    <br />
+    <div class="row">
+        <div class="col-md-12">
+            <form id="breakingForm" asp-controller="Breaking" asp-action="Create" method="post" class="row g-3 p-3" style="border: 2px solid #dee2e6; border-radius: 0.25rem;">
+
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="CurrentStatusId" />
+
+                <div class="col-md-12 mb-3">
+                    <input type="hidden" asp-for="ProcessCurrentStatus" />
+                    <div id="ProcessCurrentStatus" class="p-2 text-white text-center"
+                         style="background-color: #dc3545; border-radius: 0.25rem; font-weight: bold; font-size: 24px;">
+                        Breaking
+                    </div>
+                </div>
+
+
+                <div class="col-md-2">
+                    <label asp-for="PartNo">Part No</label>
+                    <input asp-for="PartNo" class="form-control" readonly />
+                    <span asp-validation-for="PartNo" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-2">
+                    <label asp-for="LotNo">Lot No</label>
+                    <input asp-for="LotNo" class="form-control" readonly />
+                    <span asp-validation-for="LotNo" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-2">
+                    <label asp-for="ReceivedQuantity">Received Qty</label>
+                    <input asp-for="ReceivedQuantity" class="form-control" readonly />
+                    <span asp-validation-for="ReceivedQuantity" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-2">
+                    <label asp-for="PackageSize">Package Size</label>
+                    <input asp-for="PackageSize" class="form-control" readonly />
+                    <span asp-validation-for="PackageSize" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-2">
+                    <label asp-for="CustomerName">Customer Name</label>
+                    <input asp-for="CustomerName" class="form-control" readonly />
+                    <span asp-validation-for="CustomerName" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-2">
+                    <label asp-for="PiecesPerBlank">Pieces Per Blank</label>
+                    <input asp-for="PiecesPerBlank" class="form-control" readonly />
+                    <span asp-validation-for="PiecesPerBlank" class="text-danger"></span>
+                </div>
+
+                <hr />
+
+                <div class="col-md-6">
+                    <label class="form-label">Machine Type</label>
+                    <select id="machineType" name="machineType" class="form-control" asp-for="MachineType" required>
+                        <option value="">Select machine type</option>
+                        <option value="Manual">Manual</option>
+                        <option value="Auto">Auto</option>
+                    </select>
+                    <span asp-validation-for="MachineType" class="text-danger"></span>
+                </div>
+
+
+                @Html.HiddenFor(model => model.ProcessCurrentStatus)
+
+                <  <div class="col-md-3">
+                    <label asp-for="SelectedMachineOption" class="control-label">Machine</label>
+                    <select asp-for="SelectedMachineOption" asp-items="Model.MachineOptions" class="form-control">
+                        <option value="">Please select</option>
+                    </select>
+                </div>
+
+
+                <div class="col-md-3">
+                    <label asp-for="FirstBreak">First Break Pressure</label>
+                    <input asp-for="FirstBreak" class="form-control" placeholder="Enter 1st Break Pressure" />
+                    <span asp-validation-for="FirstBreak" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-3">
+                    <label asp-for="TargetOne">Target of 1st Break Pressure</label>
+                    <input asp-for="TargetOne" class="form-control" placeholder="Enter Target of 1st Break Pressure" />
+                    <span asp-validation-for="TargetOne" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-3">
+                    <label asp-for="SecondBreak">Second Break Pressure</label>
+                    <input asp-for="SecondBreak" class="form-control" placeholder="Enter 2nd Break Pressure" />
+                    <span asp-validation-for="SecondBreak" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-3">
+                    <label asp-for="TargetTwo">Target of 2nd Break Pressure</label>
+                    <input asp-for="TargetTwo" class="form-control" placeholder="Enter Target of 2nd Break Pressure" />
+                    <span asp-validation-for="TargetTwo" class="text-danger"></span>
+                </div>
+
+
+                <div class="col-md-4">
+                    <label asp-for="MachineStartTime">Start Time</label>
+                    <input asp-for="MachineStartTime" class="form-control" type="datetime-local" />
+                    <span asp-validation-for="MachineStartTime" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="MachineEndTime">End Time</label>
+                    <input asp-for="MachineEndTime" class="form-control" type="datetime-local" />
+                    <span asp-validation-for="MachineEndTime" class="text-danger"></span>
+                </div>
+
+             @*    <div class="col-md-4">
+                    <label asp-for="Hour">Duration (hours)</label>
+                    <input asp-for="Hour" class="form-control" readonly />
+
+                </div>
+ *@
+                <hr />
+
+                <div class="col-md-4">
+                    <label asp-for="OutputQty">Total Output Qty</label>
+                    <input asp-for="OutputQty" class="form-control" type="number" />
+                    <span asp-validation-for="OutputQty" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="RejectQty">Rejet Qty</label>
+                    <input asp-for="RejectQty" class="form-control" type="number" />
+                    <span asp-validation-for="RejectQty" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="DifferencesQty">Difference</label>
+                    <input asp-for="DifferencesQty" class="form-control" type="number" />
+                    <span asp-validation-for="DifferencesQty" class="text-danger"></span>
+                    <div id="quantityMatchMessage" class="text-success" style="display: none;"></div>
+                </div>
+
+                <div class="col-sm-12" style="margin-top: 20px;">
+                    <label><b>Breaking Defect Details</b></label>
+                    <div id="reject_details" class="row">
+                        <div class="col-sm-3 defect-detail">
+                            <label asp-for="ChippingQty">Chipping Qty</label>
+                            <input asp-for="ChippingQty" class="form-control"  placeholder="Chipping qty">
+                            <span asp-validation-for="ChippingQty" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-sm-3 defect-detail">
+                            <label asp-for="SheetBreakQty">Sheet Break Qty</label>
+                            <input asp-for="SheetBreakQty" class="form-control"  placeholder="Sheet Break qty">
+                            <span asp-validation-for="SheetBreakQty" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-sm-3 defect-detail">
+                            <label asp-for="CrackQty">Crack Qty</label>
+                            <input asp-for="CrackQty" class="form-control"  placeholder="Crack qty">
+                            <span asp-validation-for="CrackQty" class="text-danger"></span>
+                        </div>
+
+                        <div class="col-sm-3 defect-detail">
+                            <label asp-for="OthersQty">Others Qty</label>
+                            <input asp-for="OthersQty" class="form-control"  placeholder="Others qty">
+                            <span asp-validation-for="OthersQty" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+
+                @* Additional fields for Remarks *@
+                <div class="col-md-12">
+                    <label asp-for="Remarks">Remarks</label>
+                    <textarea asp-for="Remarks" class="form-control"></textarea>
+                    <span asp-validation-for="Remarks" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="Status" class="form-label">Status</label>
+                    <select asp-for="Status" class="form-select">
+                        @foreach (var statusValue in Enum.GetValues(typeof(BreakingProcessStatus)))
+                        {
+                            var status = (Enum)statusValue;
+                            <option value="@statusValue">@status.GetDisplayName()</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="CheckedBy">PIC</label>
+                    <input asp-for="CheckedBy" class="form-control" readonly />
+                    <span asp-validation-for="CheckedBy" class="text-danger"></span>
+                </div>
+                <!-- Action buttons -->
+                <div class="form-group">
+                    <input type="submit" value="Submit" class="btn btn-success" />
+                    <input type="button" value="Cancel" class="btn btn-danger" onclick="window.location.href='@Url.Action("Index")'" />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Function to handle machine type change
+            $('#MachineType').change(function () {
+                var machineType = $(this).val();
+                if (machineType === "Manual") {
+                    $('#FirstBreak').closest('div').show();
+                    $('#SecondBreak').closest('div').show();
+                    $('#TargetOne').closest('div').show();
+                    $('#TargetTwo').closest('div').show();
+                } else if (machineType === "Auto") {
+                    $('#FirstBreak').closest('div').hide();
+                    $('#SecondBreak').closest('div').hide();
+                    $('#TargetOne').closest('div').hide();
+                    $('#TargetTwo').closest('div').hide();
+                }
+            });
+
+            // Function to calculate duration
+            function calculateDuration() {
+                var startTime = new Date($('#MachineStartTime').val());
+                var endTime = new Date($('#MachineEndTime').val());
+                if (!isNaN(startTime) && !isNaN(endTime) && startTime < endTime) {
+                    var duration = (endTime - startTime) / (1000 * 60 * 60);
+                    $('#Hour').val(duration.toFixed(2));
+                } else {
+                    $('#Hour').val('');
+                }
+            }
+
+            // Register change event listeners for MachineStartTime and MachineEndTime
+            $('#MachineStartTime, #MachineEndTime').change(calculateDuration);
+
+            // Initial calculation on page load if both times are already set
+            calculateDuration();
+        });
+        $(document).ready(function () {
+            // Function to check quantities after entering RejectQty and Difference
+            $('#RejectQty, #Difference').on('change', function () {
+                checkQuantities();
+            });
+
+            // Function to check sum of defects when any of the defect input fields change
+            $('#ChippingQty, #SheetBreakQty, #CrackQty, #OthersQty').on('change', function () {
+                checkDefects();
+            });
+        });
+
+        function checkQuantities() {
+            // Retrieve values from the input fields
+            let outputQty = parseFloat($('#OutputQty').val()) || 0;
+            let rejectQty = parseFloat($('#RejectQty').val()) || 0;
+            let difference = parseFloat($('#Difference').val()) || 0;
+            let receivedQty = parseFloat($('#ReceivedQuantity').val()) || 0;
+
+            let total = outputQty + rejectQty + difference;
+
+            if (total !== receivedQty) {
+                // Show error message if the total does not match the received quantity
+                Swal.fire({
+                    title: "Error!",
+                    text: "The total of Output Qty, Reject Qty, and Difference does not match the Received Quantity!",
+                    icon: "error",
+                    confirmButtonText: "OK"
+                }).then((value) => {
+                    // Reset the fields when the user clicks "OK"
+                    $('#OutputQty, #RejectQty, #Difference').val('');
+                });
+            } else {
+                // Show success message if quantities match
+                Swal.fire("Success!", "Quantities matched with Received Quantity!", "success");
+            }
+        }
+
+        function checkDefects() {
+            // Retrieve values from the input fields
+            let chippingQty = parseFloat($('#ChippingQty').val()) || 0;
+            let sheetBreakQty = parseFloat($('#SheetBreakQty').val()) || 0;
+            let crackQty = parseFloat($('#CrackQty').val()) || 0;
+            let othersQty = parseFloat($('#OthersQty').val()) || 0;
+            let rejectQty = parseFloat($('#RejectQty').val()) || 0;
+
+            // Check if all defect quantities are entered
+            if (chippingQty !== 0 && sheetBreakQty !== 0 && crackQty !== 0 && othersQty !== 0) {
+                let totalDefects = chippingQty + sheetBreakQty + crackQty + othersQty;
+
+                // Compare total defects with reject quantity
+                if (totalDefects !== rejectQty) {
+                    // Show error message if the total of defects does not match the reject quantity
+                    Swal.fire({
+                        title: "Error!",
+                        text: "The total of defects does not match the Reject Quantity!",
+                        icon: "error",
+                        confirmButtonText: "OK"
+                    }).then(() => {
+                        // Reset the fields when the user clicks "OK"
+                        $('#ChippingQty, #SheetBreakQty, #CrackQty, #OthersQty').val('');
+                    });
+                } else {
+                    // Show success message if quantities match
+                    Swal.fire("Success!", "Quantities match with Reject Quantity!", "success");
+                }
+            }
+        }
+        function updateMachineId() {
+            var selectedMachineName = document.getElementById("SelectedMachineName").value;
+            if (selectedMachineName) {
+                // Send AJAX request to retrieve MachineId
+                $.ajax({
+                    url: '/Breaking/GetMachineId',
+                    type: 'GET',
+                    data: { machineName: selectedMachineName },
+                    success: function (data) {
+                        // Update the MachineId field with the retrieved value
+                        document.getElementById("MachineId").value = data;
+                    },
+                    error: function () {
+                        console.log('Error occurred while fetching MachineId.');
+                    }
+                });
+            }
+        }
+    </script>
+}

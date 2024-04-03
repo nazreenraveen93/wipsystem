@@ -9,10 +9,13 @@ using Newtonsoft.Json;
 using DinkToPdf;
 using DinkToPdf.Contracts;
 using System.Diagnostics;
+using Microsoft.AspNetCore.Authorization;
+
 
 
 namespace WIPSystem.Web.Controllers
 {
+    //[Authorize(Roles = "Admin, Super Admin")]
     public class LotTravellerController : Controller
     {
         private readonly WIPDbContext _wIPDbContext;

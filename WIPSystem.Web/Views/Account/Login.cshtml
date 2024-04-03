@@ -1,0 +1,109 @@
+﻿@model WIPSystem.Web.ViewModels.LoginViewModel
+
+@{
+    Layout = null; // No layout to ensure full control over the page
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RF Brazing WIP System - Login</title>
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #f4f4f4;
+        }
+
+        .login-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background: white;
+            overflow: hidden;
+            width: 800px; /* Adjust width as necessary */
+            height: 450px; /* Adjust height as necessary */
+        }
+
+        .login-form {
+            padding: 40px;
+            flex-grow: 1;
+            max-width: 350px;
+        }
+
+            .login-form h2 {
+                color: #333;
+                margin-bottom: 20px;
+            }
+
+            .login-form input {
+                border: 1px solid #ccc;
+                margin-bottom: 20px;
+                padding: 10px;
+                border-radius: 5px;
+                width: calc(100% - 20px); /* Input width minus padding */
+            }
+
+
+            .login-form .submit-button {
+                background-color: #f9a825;
+                border: none;
+                padding: 10px 20px;
+                cursor: pointer;
+                color: white;
+                border-radius: 5px;
+                width: 100%;
+                box-sizing: border-box; /* Ensures padding doesn't affect width */
+            }
+
+            
+        .login-aside {
+            background-color: #f4f4f4;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            max-width: 450px;
+        }
+
+            .login-aside h2 {
+                margin-bottom: 15px;
+                font-size: 24px;
+                color: #333;
+            }
+
+            .login-aside p {
+                font-size: 16px;
+                color: #666;
+            }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-form">
+            <h1>LOGIN </h1>
+            <form asp-controller="Account" asp-action="Login" method="post">
+                <input asp-for="Username" placeholder="Username" />
+                <input asp-for="Password" placeholder="Password" type="password" />
+              
+                <input type="submit" value="SUBMIT" class="submit-button" />
+            </form>
+        </div>
+        <div class="login-aside">
+            <h2>Welcome to RF Brazing WIP System</h2>
+            <p>Your journey to efficient work process management begins here. Please enter your credentials to proceed.</p>
+        </div>
+    </div>
+</body>
+</html>

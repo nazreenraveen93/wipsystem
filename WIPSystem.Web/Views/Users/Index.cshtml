@@ -1,0 +1,121 @@
+﻿@model IEnumerable<WIPSystem.Web.Models.UserEntity>
+
+<div class="container-fluid" style="margin-top: 20px;">
+    <div class="card">
+        <div class="card-header">
+            <h1 class="card-title text-uppercase" style="font-weight: bold;">Users Index</h1>
+            <div class="text-end">
+                <a asp-action="Create" class="btn" style="background-color:#D1EDF4; color: black; border-color:#D1EDF4; font-weight: bold;">
+                    <i class="bi bi-plus-circle"></i> New User
+                </a>
+            </div>
+        </div>
+        <div class="card-body">
+            @if (Model.Any())
+            {
+                <table class="table table-bordered" id="usersTable">
+                    <thead>
+                        <tr>
+                            <th>@Html.DisplayNameFor(model => model.username)</th>
+                            <th>@Html.DisplayNameFor(model => model.employeeNo)</th>
+                            <th>@Html.DisplayNameFor(model => model.Department)</th>
+                            <th>@Html.DisplayNameFor(model => model.Role)</th>
+                            <th>@Html.DisplayNameFor(model => model.Process)</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@Html.DisplayFor(modelItem => item.username)</td>
+                                <td>@Html.DisplayFor(modelItem => item.employeeNo)</td>
+                                <td>@(item.Department != null ? item.Department.DepartmentName : "N/A")</td>
+                                <td>@Html.DisplayFor(modelItem => item.Role)</td>
+                                <td>@(item.Process != null ? item.Process.ProcessName : "N/A")</td>
+                                <td style="width: 5%;">
+                                    @if (ViewData["CanEdit"] != null && (bool)ViewData["CanEdit"])
+                                    {
+                                        <div class="btn-group" role="group">
+                                            <a asp-action="Edit" asp-route-id="@item.UserId" class="btn btn-warning rounded-circle d-inline-flex justify-content-center align-items-center"
+                                               data-toggle="tooltip"
+                                               data-placement="top"
+                                               title="Edit"
+                                               style="width: 35px; height: 35px; padding: 0; margin-right: 10px;">
+                                                <i class="bi bi-pencil-square"></i>
+                                            </a>
+                                            <button onclick="loadAndShowDetails(@item.UserId)" class="btn btn-primary rounded-circle d-inline-flex justify-content-center align-items-center"
+                                                    data-toggle="tooltip"
+                                                    data-placement="top"
+                                                    title="Details"
+                                                    style="width: 35px; height: 35px; padding: 0; margin-right: 10px;">
+                                                <i class="bi bi-eye"></i>
+                                            </button>
+                                            <a asp-action="Delete" asp-route-id="@item.UserId" class="btn btn-danger rounded-circle d-inline-flex justify-content-center align-items-center"
+                                               data-toggle="tooltip" data-placement="top" title="Delete" style="width: 35px; height: 35px; padding: 0; margin-right: 10px;">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        </div>
+                                    }
+                                </td>
+
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            }
+            else
+            {
+                <h2 class="text-center text-warning">No Records to Show</h2>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Placeholder for Details Modal -->
+<div id="userDetailsModalContainer"></div>
+
+@section Scripts{
+    <script>
+
+        // Define loadAndShowDetails globally
+        function loadAndShowDetails(Id) {
+            $.ajax({
+                url: '/Users/Details/' + Id,  // Adjust the URL as needed
+                method: 'GET',
+                success: function (data) {
+                    $('#userDetailsModalContainer').html(data);
+                    $('#userDetailsModal').modal('show');
+                },
+                error: function (error) {
+                    console.error('Error:', error);
+                }
+            });
+        }
+
+        $(document).ready(function () {
+            // Initialize DataTable
+            $('.table').DataTable({
+                language: {
+                    search: "_INPUT_",
+                    searchPlaceholder: "Search..."
+                }
+            });
+
+            $(document).on('click', '.close', function () {
+                $('#userDetailsModal').modal('hide');
+            });
+
+            // Initialize the modal
+            $('#userDetailsModal').modal({
+                show: false
+            });
+
+            // Event listener for when the modal is hidden
+            $('#userDetailsModal').on('hidden.bs.modal', function (e) {
+                $('#userDetailsModalContainer').empty();
+            });
+        });
+
+    </script>
+}

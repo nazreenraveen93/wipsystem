@@ -1,0 +1,87 @@
+﻿@model WIPSystem.Web.ViewModel.BurrRemoveViewModel
+
+<!-- Modal -->
+<div class="modal fade" id="detailsModal" tabindex="-1" role="dialog" aria-labelledby="detailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detailsModalLabel">Details of Burr Remove Process</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row g-3 p-3" style="border: 2px solid #dee2e6; border-radius: 0.25rem;">
+                    <div class="col-md-12 mb-3">
+                        <div class="p-2 text-white text-center" style="background-color: green; border-radius: 0.25rem; font-weight: bold; font-size: 24px;">
+                            @Model.ProcessCurrentStatus
+                        </div>
+                    </div>
+
+                    <!-- PartNo -->
+                    <div class="col-md-3">
+                        <label class="form-label">Part No</label>
+                        <input type="text" class="form-control" value="@Model.PartNo" readonly />
+                    </div>
+
+                    <!-- LotNo -->
+                    <div class="col-md-3">
+                        <label class="form-label">Lot No</label>
+                        <input type="text" class="form-control" value="@Model.LotNo" readonly />
+                    </div>
+
+                    <div class="col-md-3">
+                        <label class="form-label">Customer Name</label>
+                        <input type="text" class="form-control" value="@Model.CustomerName" readonly />
+                    </div>
+
+                    <!-- PackageSize -->
+                    <div class="col-md-3">
+                        <label class="form-label">Package Size</label>
+                        <input type="text" class="form-control" value="@Model.PackageSize" readonly />
+                    </div>
+
+                    <!-- PiecePerBlank -->
+                    <div class="col-md-3">
+                        <label class="form-label">Piece Per Blank</label>
+                        <input type="text" class="form-control" value="@Model.PiecesPerBlank.ToString()" readonly />
+                    </div>
+
+                    <!-- OutputQuantity -->
+                    <div class="col-md-3">
+                        <label class="form-label">Output Quantity</label>
+                        <input type="number" class="form-control" value="@Model.OutputQty" readonly />
+                    </div>
+
+                    <!-- OutputQuantity -->
+                    <div class="col-md-3">
+                        <label class="form-label">Reject Quantity</label>
+                        <input type="number" class="form-control" value="@Model.RejectQty" readonly />
+                    </div>
+
+                    <!-- Status -->
+                    <div class="col-md-6">
+                        <label class="form-label">Status</label>
+                        <input type="text" class="form-control" value="@Model.Status.ToString()" readonly />
+                    </div>
+
+                    <!-- Remarks -->
+                    <div class="col-md-6">
+                        <label class="form-label">Remarks</label>
+                        <input type="text" class="form-control" value="@Model.Remarks" readonly />
+                    </div>
+
+                    <!-- CheckedBy -->
+                    <div class="col-md-6">
+                        <label class="form-label">Issued By</label>
+                        <input type="text" class="form-control" value="@Model.CheckedBy" readonly />
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

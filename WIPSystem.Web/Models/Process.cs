@@ -17,6 +17,9 @@ namespace WIPSystem.Web.Models
 
         public ICollection<ProductProcessMapping> ProductProcessMappings { get; set; }
 
+        public ICollection<Machine> Machines { get; set; }
+
+      
     }
 
 }

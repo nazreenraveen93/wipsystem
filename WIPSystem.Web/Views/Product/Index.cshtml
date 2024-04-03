@@ -1,5 +1,6 @@
 ﻿@model List<Product>
 
+<div class="container-fluid" style="margin-top: 20px;">
 <div class="container-fluid">
     <div class="card">
         <div class="col-12">
@@ -42,7 +43,7 @@
                                         <a asp-controller="Product"
                                            asp-action="Edit"
                                            asp-route-ProductId="@item.ProductId"
-                                           class="btn btn-warning"
+                                           class="btn btn-warning me-2 rounded-circle d-inline-flex justify-content-center align-items-center"
                                            data-toggle="tooltip"
                                            data-placement="top"
                                            title="Edit"
@@ -52,14 +53,15 @@
                                         </a>
 
                                         <a asp-controller="Product" asp-action="RegisterProcessFlow" asp-route-ProductId="@item.ProductId"
-                                           class="btn btn-dark @(processExists ? "disabled" : "")"
+                                           class="btn btn-dark me-2 rounded-circle d-inline-flex justify-content-center align-items-center @(processExists ? "disabled" : "")"
                                            style="margin-right: 10px;"
                                            title="@(processExists ? "Process Flow Already Added" : "Add Process Flow")">
                                             <i class="bi bi-cpu"></i>
                                         </a>
 
-                                        <a asp-controller="Product" asp-action="Delete" asp-route-ProductId="@item.ProductId" class="btn btn-danger"
-                                           data-toggle="tooltip" data-placement="top" title="Delete">
+                                        <a asp-controller="Product" asp-action="Delete" asp-route-ProductId="@item.ProductId"
+                                           class="btn btn-danger me-2 rounded-circle d-inline-flex justify-content-center align-items-center"
+                                           data-toggle="tooltip" data-placement="top" title="Delete" style="margin-right: 10px;">
                                             <i class="bi bi-trash"></i>
                                         </a>
                                     </div>
@@ -76,6 +78,7 @@
         </div>
 
     </div>
+</div>
 </div>
 @section Scripts{
     <script>

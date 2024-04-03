@@ -1,0 +1,394 @@
+﻿@model CamberViewModel
+@{
+    ViewData["Title"] = "Edit Camber Process";
+}
+
+<div class="container">
+    <h2 class="text-uppercase text-center">Edit Camber Selec Process</h2>
+    <br />
+
+    <!-- Display validation errors here -->
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger" role="alert">
+            @foreach (var item in ViewData.ModelState.Values)
+            {
+                foreach (var error in item.Errors)
+                {
+                    <p>@error.ErrorMessage</p>
+                }
+            }
+        </div>
+    }
+    <br />
+
+    <div class="row">
+        <div class="col-md-12">
+            <!-- Note the asp-action is now "Edit" -->
+            <form id="editcamberForm" asp-controller="Camber" asp-action="Edit" method="post" class="row g-3 p-3" style="border: 2px solid #dee2e6; border-radius: 0.25rem;">
+
+                @Html.AntiForgeryToken()
+
+                <!-- Use hidden fields to store IDs -->
+                @Html.HiddenFor(model => model.CamberId)
+                @Html.HiddenFor(model => model.CurrentStatusId)
+
+                <div class="col-md-4">
+                    <label asp-for="PartNo">Part No</label>
+                    <input asp-for="PartNo" class="form-control" readonly />
+                    <span asp-validation-for="PartNo" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="LotNo">Lot No</label>
+                    <input asp-for="LotNo" class="form-control" readonly />
+                    <span asp-validation-for="LotNo" class="text-danger"></span>
+                </div>
+
+                  <div class="col-md-4">
+                <label asp-for="ReceivedQuantity">Received Qty</label>
+                <input asp-for="ReceivedQuantity" class="form-control" readonly />
+                <span asp-validation-for="ReceivedQuantity" class="text-danger"></span>
+                </div>
+               
+                <div class="col-md-4">
+                    <label asp-for="PackageSize">Package Size</label>
+                    <input asp-for="PackageSize" class="form-control" readonly />
+                    <span asp-validation-for="PackageSize" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="CustomerName">Customer Name</label>
+                    <input asp-for="CustomerName" class="form-control" readonly />
+                    <span asp-validation-for="CustomerName" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="PiecesPerBlank">Pieces Per Blank</label>
+                    <input asp-for="PiecesPerBlank" class="form-control" readonly />
+                    <span asp-validation-for="PiecesPerBlank" class="text-danger"></span>
+                </div>
+
+                @Html.HiddenFor(model => model.ProcessStatus)
+           
+                 <div class="col-md-4">
+                        <label class="control-label">Machine</label>
+                        <input type="text" class="form-control" value="@Model.MachineName" readonly />
+                    </div>
+
+                <div class="col-md-4">
+                    <label asp-for="MachineStartTime">Start Time</label>
+                    <input asp-for="MachineStartTime" class="form-control" type="datetime-local" />
+                    <span asp-validation-for="MachineStartTime" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="MachineEndTime">End Time</label>
+                    <input asp-for="MachineEndTime" class="form-control" type="datetime-local" />
+                    <span asp-validation-for="MachineEndTime" class="text-danger"></span>
+                </div>
+                <hr />
+
+                <div class="row">
+                    <div class="col-sm-3" style="margin-top: 20px;">
+                        <label asp-for="InputQty">Input Qty</label>
+                        <input asp-for="InputQty" id="inputQtyInput" class="form-control" placeholder="Input Qty" required>
+                        <span asp-validation-for="InputQty" class="text-danger"></span>
+                        <div id="matchStatus" style="font-weight: bold;"></div>
+                    </div>
+
+                    <div class="col-sm-3" style="margin-top: 20px;">
+                        <label asp-for="AvgThickness">Avg Thickness,mm</label>
+                        <input asp-for="AvgThickness" class="form-control" placeholder="Avg Substrate Thickness,mm" step="0.00001" required>
+                        <span asp-validation-for="AvgThickness" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-sm-3" style="margin-top: 20px;">
+                        <label asp-for="TotalWeight">Total Weight, g</label>
+                        <input id="totalWeightInput" asp-for="TotalWeight" class="form-control" placeholder="Total weight for 50pcs" step="any" required>
+                        <span asp-validation-for="TotalWeight" class="text-danger"></span>
+                    </div>
+
+                    <div class="col-sm-3" style="margin-top: 20px;">
+                        <label asp-for="PieceWeight">Piece Weight, g</label>
+                        <input id="pieceWeightInput" asp-for="PieceWeight" class="form-control" placeholder="Piece weight, g" step="any" required>
+                        <span asp-validation-for="PieceWeight" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <hr>
+                 @*  <div class="col-md-4">
+                    <label asp-for="OutputQty">Total Output Qty</label>
+                    <input asp-for="OutputQty" class="form-control" type="number" />
+                    <span asp-validation-for="OutputQty" class="text-danger"></span>
+                </div> *@
+
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th rowspan="2">Substrate Camber Range</th>
+                            <th>Accept</th>
+                            <th colspan="2">Reject</th>
+                            <th rowspan="2">Total Quantity, pcs</th>
+                        </tr>
+                        <tr>
+                            <th>
+                                <div class="input-group">
+                                    <input asp-for="Range" class="form-control">
+                                    @*  <input asp-for="Range" class="form-control"> *@
+                                </div>
+                            </th>
+
+
+                            <th>reject from machine</th>
+                            <th>reject camber out of spec</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Quantity, pcs</td>
+                            <td><input asp-for="OutputQty" id="outputQtyInput" class="form-control"></td>
+                            <td><input asp-for="MachineRejectQty" id="machineRejectQtyInput" class="form-control"></td>
+                            <td><input asp-for="CamberQty" id="camberQtyInput" class="form-control"></td>
+                            <td>
+                                <input asp-for="TotalQty" id="totalQtyInput" class="form-control" readonly>
+                                <span asp-validation-for="TotalQty" class="text-danger"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                        <tr>
+                        <tr>
+                            <td colspan="2">Yield: <input asp-for="Yield" class="form-control" size="5" id="yieldInput" placeholder="Enter Yield" oninput="appendPercentage(this) "></td>
+                            <td colspan="3">Reject Rate: <input asp-for="RejectRate" id="rejectRateInput" class="form-control" size="5" placeholder="Enter Reject Rate" oninput="appendPercentage(this)"></td>
+                        </tr>
+
+
+                    </tbody>
+                </table>
+
+
+                @* Additional fields for Remarks *@
+                <div class="col-md-6">
+                    <label asp-for="Remarks">Remarks</label>
+                    <textarea asp-for="Remarks" class="form-control"></textarea>
+                    <span asp-validation-for="Remarks" class="text-danger"></span>
+                </div>
+
+                <div class="col-md-6">
+                    <label asp-for="Status" class="form-label">Status</label>
+                    <select asp-for="Status" class="form-select">
+                        @foreach (var statusValue in Enum.GetValues(typeof(BreakingProcessStatus)))
+                        {
+                            var status = (Enum)statusValue;
+                            <option value="@statusValue">@status.GetDisplayName()</option>
+                        }
+                    </select>
+                </div>
+
+
+                <div class="col-md-6">
+                    <label asp-for="CheckedBy">PIC</label>
+                    <input asp-for="CheckedBy" class="form-control" readonly />
+                    <span asp-validation-for="CheckedBy" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <input type="submit" value="Update" class="btn btn-success" />
+                    <input type="button" value="Cancel" class="btn btn-danger" onclick="window.location.href='@Url.Action("Index1")'" />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function calculateDuration() {
+            var startTime = new Date($('#MachineStartTime').val());
+            var endTime = new Date($('#MachineEndTime').val());
+            console.log("Start Time:", startTime);
+            console.log("End Time:", endTime);
+            if (!isNaN(startTime) && !isNaN(endTime) && startTime < endTime) {
+                var duration = (endTime - startTime) / (1000 * 60 * 60);
+                console.log("Duration (hours):", duration);
+                $('#Hour').val(duration.toFixed(2));
+            } else {
+                $('#Hour').val('');
+            }
+        }
+
+        // Register change event listeners for MachineStartTime and MachineEndTime
+        $('#MachineStartTime, #MachineEndTime').change(calculateDuration);
+
+        // Initial calculation on page load if both times are already set
+        calculateDuration();
+
+
+        function updateMachineId() {
+            var selectedMachineName = document.getElementById("SelectedMachineName").value;
+            if (selectedMachineName) {
+                // Send AJAX request to retrieve MachineId
+                $.ajax({
+                    url: '/Breaking/GetMachineId',
+                    type: 'GET',
+                    data: { machineName: selectedMachineName },
+                    success: function (data) {
+                        // Update the MachineId field with the retrieved value
+                        document.getElementById("MachineId").value = data;
+                    },
+                    error: function () {
+                        console.log('Error occurred while fetching MachineId.');
+                    }
+                });
+            }
+        }
+        function appendPercentage(input) {
+            // Remove any existing "%" symbol
+            input.value = input.value.replace("%", "");
+
+            // Append "%" symbol to the end of the value
+            input.value += "%";
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            // Get references to the total weight input and piece weight input
+            var totalWeightInput = document.getElementById("totalWeightInput");
+            var pieceWeightInput = document.getElementById("pieceWeightInput");
+
+            // Add event listener for changes in the total weight input
+            totalWeightInput.addEventListener("input", function () {
+                // Get the value of total weight
+                var totalWeight = parseFloat(totalWeightInput.value);
+
+                // Calculate piece weight if total weight is not NaN and greater than 0
+                if (!isNaN(totalWeight) && totalWeight > 0) {
+                    var pieceWeight = totalWeight / 50; // Calculate piece weight
+                    pieceWeightInput.value = pieceWeight.toFixed(2); // Update piece weight input field
+                } else {
+                    pieceWeightInput.value = ""; // Clear piece weight input field if total weight is invalid
+                }
+            });
+        });
+        document.addEventListener("DOMContentLoaded", function () {
+            var inputQtyInput = document.getElementById("inputQtyInput");
+            var matchStatus = document.getElementById("matchStatus");
+
+            // Function to check match status and update display
+            function updateMatchStatus() {
+                var inputQty = parseInt(inputQtyInput.value);
+                var receivedQty = parseInt('@Model.ReceivedQuantity'); // Assuming ReceivedQuantity is passed from the model
+
+                if (!isNaN(inputQty) && !isNaN(receivedQty)) {
+                    if (inputQty === receivedQty) {
+                        matchStatus.textContent = "Received Qty Matched with Input Qty!";
+                        matchStatus.style.color = "green";
+                    } else {
+                        matchStatus.textContent = "Received Qty Not Matched with Inpu Qty!";
+                        matchStatus.style.color = "red";
+                    }
+                } else {
+                    matchStatus.textContent = ""; // Clear the match status if input is not valid
+                }
+            }
+
+            // Add event listener to update match status on input
+            inputQtyInput.addEventListener("input", updateMatchStatus);
+
+            // Update match status on page load
+            updateMatchStatus();
+        });
+        document.addEventListener("DOMContentLoaded", function () {
+            var inputQtyInput = document.getElementById("inputQtyInput");
+            var outputQtyInput = document.getElementById("outputQtyInput");
+            var yieldInput = document.getElementById("yieldInput");
+
+            // Function to calculate yield
+            function calculateYield() {
+                var inputQty = parseFloat(inputQtyInput.value);
+                var outputQty = parseFloat(outputQtyInput.value);
+
+                // Check if inputQty and outputQty are valid numbers and outputQty is not zero
+                if (!isNaN(inputQty) && !isNaN(outputQty) && outputQty !== 0) {
+                    var yieldValue = (inputQty / outputQty) * 100;
+                    yieldInput.value = yieldValue.toFixed(2);
+                } else {
+                    yieldInput.value = ""; // Clear yield input if values are invalid
+                }
+            }
+
+            // Add event listeners to inputQty and outputQty fields to calculate yield
+            inputQtyInput.addEventListener("input", calculateYield);
+            outputQtyInput.addEventListener("input", calculateYield);
+
+            // Initial calculation on page load if both inputQty and outputQty are already set
+            calculateYield();
+        });
+        document.addEventListener("DOMContentLoaded", function () {
+            var machineRejectQtyInput = document.getElementById("machineRejectQtyInput");
+            var camberQtyInput = document.getElementById("camberQtyInput");
+            var inputQtyInput = document.getElementById("inputQtyInput");
+            var rejectRateInput = document.getElementById("rejectRateInput");
+
+            // Function to calculate Reject Rate
+            function calculateRejectRate() {
+                var machineRejectQty = parseFloat(machineRejectQtyInput.value);
+                var camberQty = parseFloat(camberQtyInput.value);
+                var inputQty = parseFloat(inputQtyInput.value);
+
+                // Check if inputQty, machineRejectQty, and camberQty are valid numbers and inputQty is not zero
+                if (!isNaN(inputQty) && inputQty !== 0) {
+                    var rejectRate = ((machineRejectQty + camberQty) / inputQty) * 100;
+                    rejectRateInput.value = rejectRate.toFixed(2);
+                } else {
+                    rejectRateInput.value = ""; // Clear reject rate input if values are invalid
+                }
+            }
+
+            // Add event listeners to inputQty, machineRejectQty, and camberQty fields to calculate Reject Rate
+            inputQtyInput.addEventListener("input", calculateRejectRate);
+            machineRejectQtyInput.addEventListener("input", calculateRejectRate);
+            camberQtyInput.addEventListener("input", calculateRejectRate);
+
+            // Initial calculation on page load if inputQty, machineRejectQty, and camberQty are already set
+            calculateRejectRate();
+        });
+        document.addEventListener("DOMContentLoaded", function () {
+            var outputQtyInput = document.getElementById("outputQtyInput");
+            var machineRejectQtyInput = document.getElementById("machineRejectQtyInput");
+            var camberQtyInput = document.getElementById("camberQtyInput");
+            var totalQtyInput = document.getElementById("totalQtyInput");
+            var inputQtyInput = document.getElementById("inputQtyInput");
+            var matchStatus = document.getElementById("matchStatus");
+
+            // Function to calculate TotalQty and validate match with InputQty
+            function calculateAndValidateTotalQty() {
+                var outputQty = parseFloat(outputQtyInput.value);
+                var machineRejectQty = parseFloat(machineRejectQtyInput.value);
+                var camberQty = parseFloat(camberQtyInput.value);
+
+                // Calculate TotalQty
+                var totalQty = outputQty + machineRejectQty + camberQty;
+                totalQtyInput.value = totalQty;
+
+                // Validate if TotalQty matches InputQty
+                var inputQty = parseFloat(inputQtyInput.value);
+                if (!isNaN(inputQty) && totalQty !== inputQty) {
+                    matchStatus.textContent = "Total Qty must match Input Qty";
+                    matchStatus.style.color = "red";
+                } else {
+                    matchStatus.textContent = "";
+                    matchStatus.style.color = ""; // Clear match status if matched
+                }
+            }
+
+            // Add event listeners to input fields to calculate TotalQty and validate match with InputQty
+            outputQtyInput.addEventListener("input", calculateAndValidateTotalQty);
+            machineRejectQtyInput.addEventListener("input", calculateAndValidateTotalQty);
+            camberQtyInput.addEventListener("input", calculateAndValidateTotalQty);
+            inputQtyInput.addEventListener("input", calculateAndValidateTotalQty);
+
+            // Initial calculation on page load if outputQty, machineRejectQty, and camberQty are already set
+            calculateAndValidateTotalQty();
+        });
+
+    </script>
+}

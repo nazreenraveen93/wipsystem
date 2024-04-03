@@ -1,0 +1,97 @@
+﻿@model WIPSystem.Web.ViewModel.IncomingProcessViewModel
+
+@{
+    ViewBag.Title = "Edit Incoming Process";
+}
+
+<div class="container">
+    <h2 class="text-uppercase text-center">Edit Incoming Process</h2>
+    <br />
+    <div class="row">
+        <div class="col-md-12">
+            <form asp-controller="Incoming" asp-action="Edit" method="post" class="row g-3 p-3" style="border: 2px solid #dee2e6; border-radius: 0.25rem;">
+                <!-- Include the hidden field for IncomingProcessId -->
+                <input type="hidden" asp-for="IncomingProcessId" />
+
+                <div class="col-md-12 mb-3">
+                    <div id="CurrentStatus" class="p-2 text-white text-center" style="background-color: #dc3545; border-radius: 0.25rem; font-weight: bold; font-size: 24px;">Incoming</div>
+                </div>
+
+                <!-- PartNo dropdown -->
+                <div class="col-md-6">
+                    <label asp-for="PartNo" class="form-label">Part No</label>
+                    <select asp-for="PartNo" asp-items="Model.PartNos" class="form-select" id="partNoDropdown">
+                        <option value="">-- Select Part No --</option>
+                    </select>
+                </div>
+
+                <!-- CustomerName -->
+                <div class="col-md-6">
+                    <label asp-for="CustomerName" class="form-label">Customer Name</label>
+                    <input asp-for="CustomerName" class="form-control" readonly />
+                    <input type="hidden" asp-for="CustomerName" />
+                </div>
+
+                <!-- PackageSize -->
+                <div class="col-md-4">
+                    <label asp-for="PackageSize" class="form-label">Package Size</label>
+                    <input asp-for="PackageSize" class="form-control" readonly />
+                    <input type="hidden" asp-for="PackageSize" />
+                </div>
+
+                <!-- PiecePerBlank -->
+                <div class="col-md-4">
+                    <label asp-for="PiecePerBlank" class="form-label">Piece Per Blank</label>
+                    <input asp-for="PiecePerBlank" class="form-control" readonly />
+                    <input type="hidden" asp-for="PiecePerBlank" />
+                </div>
+
+                <!-- LotNo dropdown -->
+                <div class="col-md-4">
+                    <label asp-for="LotNo" class="form-label">Lot No</label>
+                    <select asp-for="LotNo" class="form-select" asp-items="Model.LotNos">
+                        <option value="">-- Select Lot No --</option>
+                    </select>
+                </div>
+
+                <!-- ReceivedQuantity -->
+                <div class="col-md-6">
+                    <label asp-for="ReceivedQuantity" class="form-label">Received Quantity</label>
+                    <input asp-for="ReceivedQuantity" class="form-control" type="number" />
+                </div>
+
+                <!-- Status dropdown -->
+                <div class="col-md-6">
+                    <label asp-for="Status" class="form-label">Status</label>
+                    <select asp-for="Status" class="form-select">
+                        @foreach (var status in Enum.GetValues(typeof(WIPSystem.Web.Models.IncomingProcessStatus)))
+                        {
+                            <option value="@((int)status)">@status.ToString()</option>
+                        }
+                    </select>
+                </div>
+
+                <!-- Remarks -->
+                <div class="col-md-6">
+                    <label asp-for="Remarks" class="form-label">Remarks</label>
+                    <textarea asp-for="Remarks" class="form-control" rows="3"></textarea>
+                </div>
+
+                <!-- CheckedBy -->
+                <div class="col-md-6">
+                    <label asp-for="CheckedBy" class="form-label">Issued By</label>
+                    <input asp-for="CheckedBy" class="form-control" id="checkedByInput" />
+                </div>
+
+                <div class="col-12 text-center">
+                    <div style="width: 50%; margin: 0 auto;">
+                        <button type="submit" class="btn btn-primary">Update</button>
+                        <!-- Back Button -->
+                        <button type="button" class="btn btn-secondary" onclick="window.history.back();">Back</button>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>

@@ -12,6 +12,7 @@
         public string PartNo { get; set; }
         public string Camber { get; set; }
 
+        public int ProcessId { get; set; }
         // Navigation property to SplitDetail
         public virtual ICollection<SplitDetail> SplitDetails { get; set; }
     }

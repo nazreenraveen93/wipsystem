@@ -1,0 +1,68 @@
+﻿@model List<WIPSystem.Web.Models.CurrentStatus>
+
+
+@{
+    ViewBag.Title = "Camber Insp All Processes";
+
+}
+
+<div class="container-fluid" style="margin-top: 20px;">
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-header">
+                <h1 class="card-title text-uppercase" style="font-weight: bold;">Camber Insp All Processes (Waiting List of Products)</h1>
+            </div>
+            <div class="card-body">
+                @if (Model.Any())
+                {
+                    <table class="table table-bordered" id="CamberProcess">
+                        <thead>
+                            <tr>
+                                <th>Date & Time</th>
+                                <th>Part No</th>
+                                <th>Lot No</th>
+                                <th>Received Quantity</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>@item.Date.ToString("g")</td>
+                                    <td>@item.PartNo</td>
+                                    <td>@item.LotNo</td>
+                                    <td>@item.ReceivedQuantity</td>
+                                    <td>@item.Status</td>
+                                    <td style="width: 7%;">
+                                        <!-- Pass CurrentStatusId to the Create action of ThousandSinter controller -->
+                                        <a asp-controller="CamberInspAll" asp-action="Create" asp-route-CurrentStatusId="@item.CurrentStatusId" style="color: red;">Click Here</a>
+                                    </td>
+
+                                </tr>
+                            }
+
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <h2 class="text-center text-warning">No Records to Show</h2>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script>
+
+        $(document).ready(function () {
+            $('#CamberProcess').DataTable({
+                // DataTables options
+            });
+        });
+    </script>
+}

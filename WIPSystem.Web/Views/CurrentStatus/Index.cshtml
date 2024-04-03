@@ -1,0 +1,133 @@
+﻿@model List<WIPSystem.Web.Models.CurrentStatus>
+
+@{
+    ViewBag.Title = "Current Status";
+    
+}
+
+<div class="container-fluid" style="margin-top: 20px;">
+    <div class="container-fluid">
+        <div class="card">
+            <div class="card-header">
+                <h1 class="card-title text-uppercase" style="font-weight: bold;">Current Product Status</h1>
+            </div>
+            <div class="card-body">
+                @if (Model.Any())
+                {
+                    <table class="table table-bordered" id="currentStatusTable">
+                        <thead>
+                            <tr>
+                                <th>Date & Time</th>
+                                <th>Part Number</th>
+                                <th>Lot Number</th>
+                                <th>Received Quantity</th>
+                                <th>Current Status</th>
+                                <th>Status</th>
+                                <th>Remarks</th>
+                                <th>PIC</th>
+                                <th>Next Process</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                string modalId = $"statusModal-{item.CurrentStatusId}";
+
+                                <tr>
+                                    <td>@item.Date.ToString("g")</td> <!-- Format date as needed -->
+                                    <td>@item.PartNo</td>
+                                    <td>@item.LotNo</td>
+                                    <td>@item.ReceivedQuantity</td>
+                                    <td>@item.ProcessCurrentStatus</td>
+                                    <td>
+                                        <span class="badge badge-pill @(item.Status == "In Progress" ? "badge-info" : item.Status == "On Hold" ? "badge-danger" : item.Status == "Completed" ? "badge-success" : "badge-warning")">@item.Status</span>
+                                    </td>
+                                    <td>@item.Remarks</td>
+                                    <td>@item.PIC</td>
+                                    <td>
+                                            @if (item.Status == "Completed" && !string.IsNullOrEmpty(item.NextProcess))
+                                            {
+                                                if (item.NextProcess == "End of Process")
+                                                {
+                                                    <span style="color: red;">@item.NextProcess</span>
+                                                }
+                                                else
+                                                {
+                                                    <a href="#" data-toggle="modal" data-target="#@modalId" style="color: green;">@item.NextProcess</a>
+                                                    <!-- Modal for confirming status update -->
+                                                    <div class="modal fade" id="@modalId" tabindex="-1" role="dialog" aria-labelledby="statusModalLabel-@item.CurrentStatusId" aria-hidden="true">
+                                                        <div class="modal-dialog" role="document">
+                                                            <div class="modal-content">
+                                                                <div class="modal-header">
+                                                                    <h5 class="modal-title" id="statusModalLabel-@item.CurrentStatusId">Confirm Status Update</h5>
+                                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                        <span aria-hidden="true">&times;</span>
+                                                                    </button>
+                                                                </div>
+                                                                <div class="modal-body">
+                                                                    Are you sure you want to set the status to "In Progress" for Part @item.PartNo?
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                                                    <button type="button" class="btn btn-primary" onclick="confirmStatusUpdate(@item.CurrentStatusId)">Confirm</button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                }
+                                            }
+                                            else if (item.Status == "In Progress")
+                                            {
+                                                <span style="color: red;">@item.NextProcess</span>
+                                            }
+                                            else
+                                            {
+                                                <span>@item.NextProcess</span>
+                                            }
+                                        </td>
+
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <h2 class="text-center text-warning">No Records to Show</h2>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+            $('#currentStatusTable').DataTable({
+                // DataTables options
+            });
+        });
+        function confirmStatusUpdate(currentStatusId) {
+            // Close the modal first
+            $(`#statusModal-${currentStatusId}`).modal('hide');
+
+            // Send an AJAX request to your server
+            $.post('/CurrentStatus/UpdateStatus', { id: currentStatusId })
+                .done(function (response) {
+                    // Check the response, if successful, redirect to login
+                    if (response.success) {
+                        var loginRedirectUrl = '/Account/Login?returnUrl=' + encodeURIComponent(response.redirectUrl);
+                        window.location.href = loginRedirectUrl;
+                    } else {
+                        // Handle failure, maybe show an alert or another modal
+                        alert('Failed to update status.');
+                    }
+                })
+                .fail(function () {
+                    // Handle AJAX fail
+                    alert('Error contacting server.');
+                });
+        }
+
+    </script>
+}
